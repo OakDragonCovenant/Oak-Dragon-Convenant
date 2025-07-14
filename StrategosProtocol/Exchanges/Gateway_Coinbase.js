@@ -1,5 +1,4 @@
 const BaseAgent = require('../Core/BaseAgent');
-const credentials = require('../../credentials');
 const SymbolNormalizer = require('./SymbolNormalizer');
 const { CoinbasePro } = require('coinbase-pro-node'); // <-- Import the live API client
 
@@ -7,9 +6,15 @@ class Gateway_Coinbase extends BaseAgent {
     constructor() {
         super("Coinbase-Gateway", "Coinbase Exchange Gateway");
         this.client = null;
-        this.credentials = credentials.coinbase;
+        
+        // Read credentials directly from environment variables
+        this.credentials = {
+            apiKey: process.env.COINBASE_API_KEY,
+            apiSecret: process.env.COINBASE_API_SECRET,
+            passphrase: process.env.COINBASE_PASSPHRASE
+        };
 
-        if (this.credentials) {
+        if (this.credentials.apiKey && this.credentials.apiSecret && this.credentials.passphrase) {
             this.client = new CoinbasePro(this.credentials);
             console.log(`[${this.name}]: LIVE connection to Coinbase is active.`);
         } else {
