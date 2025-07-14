@@ -17,7 +17,7 @@ class ConfigManager {
     get server() {
         return {
             port: parseInt(process.env.PORT) || 3000,
-            host: process.env.HOST || 'localhost',
+            host: process.env.NODE_ENV === 'production' ? '0.0.0.0' : (process.env.HOST || 'localhost'),
             nodeEnv: process.env.NODE_ENV || 'development',
             logLevel: process.env.LOG_LEVEL || 'info'
         };

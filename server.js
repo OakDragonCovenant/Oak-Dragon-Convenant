@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 // Internal Modules
 const CovenantSystem = require('./RealtyCovenantProtocol/Core/covenantSystem');
@@ -94,6 +95,18 @@ initializeSystems();
 
 // --- Health Check & Status Endpoints ---
 app.get('/', (req, res) => {
+    logger.info('API Request', {
+        service: 'oak-dragon-covenant',
+        method: req.method,
+        url: req.url,
+        userAgent: req.get('User-Agent'),
+        ip: req.ip
+    });
+    
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/api', (req, res) => {
     res.json({
         success: true,
         message: 'Oak Dragon Mainframe: Covenant & Strategos Protocols are active',
