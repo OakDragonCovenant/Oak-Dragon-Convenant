@@ -4,7 +4,7 @@ const URLStewardAgent = require('../../OakDragonCovenant/Modules/urlStewardAgent
 const NameLoreAgent = require('../../OakDragonCovenant/Modules/nameLoreAgent');
 const ScrollscribeAgent = require('../../OakDragonCovenant/Modules/scrollscribeAgent');
 const AcquisitionAgent = require('../../OakDragonCovenant/Modules/acquisitionAgent');
-const FundManagerAgent = require('../../OakDragonCovenant/Modules/fundManagerAgent');
+const FundManagerAgent = require('../../OakDragonCovenant/Modules/FundManagerAgent');
 const SymbolicContextBinder = require('./symbolicContextBinder');
 
 /**
