@@ -1,5 +1,5 @@
 const BaseAgent = require('../Core/BaseAgent');
-const credentials = require('./credentials');
+const credentials = require('../../credentials');
 const SymbolNormalizer = require('./SymbolNormalizer');
 const { CoinbasePro } = require('coinbase-pro-node'); // <-- Import the live API client
 
