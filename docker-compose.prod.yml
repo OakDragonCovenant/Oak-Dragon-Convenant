@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  oak-dragon-app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - LOG_LEVEL=info
+      - AUTO_TRADING_ENABLED=false
+    env_file:
+      - .env.production
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - oak-dragon-network
+    depends_on:
+      - redis
+      - postgres
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - oak-dragon-network
+    command: redis-server --appendonly yes
+
+  # PostgreSQL for persistent data storage
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=oak_dragon
+      - POSTGRES_USER=oak_dragon_user
+      - POSTGRES_PASSWORD=secure_password_here
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - oak-dragon-network
+
+  # Nginx reverse proxy (optional for production)
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - oak-dragon-app
+    restart: unless-stopped
+    networks:
+      - oak-dragon-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  oak-dragon-network:
+    driver: bridge

@@ -1,0 +1,14 @@
+body {
+  background-color: black;
+  color: gold;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+#sendBtn {
+  background: darkred;
+  color: gold;
+  border: 2px solid gold;
+  padding: 8px 12px;
+  cursor: pointer;
+}

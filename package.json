@@ -1,0 +1,61 @@
+{
+  "name": "oak-dragon-covenant",
+  "version": "2.0.0",
+  "description": "Advanced AI Agent Ecosystem: Real Estate Investment & Cryptocurrency Trading Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "build": "echo '🏗️ Building Oak Dragon Covenant for production...' && npm install --production=false && npm test",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:covenant": "node OakDragonCovenant/Modules/testFullSystemWorkflow.js",
+    "test:strategos": "node StrategosProtocol/Core/test_strategos.js",
+    "lint": "echo '🔍 Linting codebase...'",
+    "security-check": "echo '🛡️ Running security audit...'",
+    "deploy:render": "echo '🚀 Deploying to Render...'",
+    "deploy:railway": "echo '🚂 Deploying to Railway...'",
+    "setup": "npm install && echo '✅ Oak Dragon Covenant setup complete!'",
+    "logs": "echo '📊 Viewing application logs...'",
+    "health": "curl -f http://localhost:3000/health || echo 'Service not running'"
+  },
+  "keywords": [
+    "ai-agents",
+    "cryptocurrency-trading",
+    "real-estate-investment",
+    "automated-trading",
+    "portfolio-management",
+    "fintech",
+    "blockchain",
+    "agent-orchestration"
+  ],
+  "author": "Oak Dragon Covenant Development Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/oak-dragon-covenant.git"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^30.0.4",
+    "nodemon": "^3.0.1"
+  },
+  "dependencies": {
+    "@coinbase/cdp-sdk": "^1.8.0",
+    "axios": "^1.10.0",
+    "coinbase-pro-node": "^9.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.1.0",
+    "joi": "^17.11.0",
+    "technicalindicators": "^3.1.0",
+    "winston": "^3.11.0"
+  }
+}

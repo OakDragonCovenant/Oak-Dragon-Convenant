@@ -1,0 +1,47 @@
+# 🚀 Render.com Deployment Configuration for Oak Dragon Covenant
+services:
+  - type: web
+    name: oak-dragon-covenant
+    env: node
+    plan: starter # Start with free tier, upgrade as needed
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    
+    # Environment Variables
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: LOG_LEVEL
+        value: info
+      - key: AUTO_TRADING_ENABLED
+        value: false
+      - key: MAX_TRADE_AMOUNT
+        value: 10
+      - key: DAILY_LOSS_LIMIT
+        value: 5
+      - key: RISK_TOLERANCE
+        value: low
+        
+    # Auto-deploy settings
+    autoDeploy: true
+    
+    # Scaling configuration
+    numInstances: 1
+    
+    # Resource limits
+    disk:
+      name: oak-dragon-data
+      mountPath: /app/data
+      sizeGB: 1
+      
+  # Optional: Database service (uncomment if needed)
+  # - type: pserv
+  #   name: oak-dragon-db
+  #   env: postgres
+  #   plan: starter
+  #   region: oregon
