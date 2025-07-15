@@ -479,6 +479,76 @@ window.exportLogs = function() {
     portal.showSuccess('Exporting system logs');
 };
 
+// Coinbase Integration Functions
+window.openCoinbasePortal = function() {
+    // Open Coinbase Pro in a new tab
+    window.open('https://pro.coinbase.com', '_blank', 'noopener,noreferrer');
+    portal.showSuccess('Opening Coinbase Pro in new tab...');
+};
+
+window.refreshCoinbaseData = function() {
+    portal.showSuccess('Refreshing Coinbase data...');
+    
+    // Simulate API call to refresh Coinbase data
+    setTimeout(() => {
+        // Update the portfolio values with fresh data
+        updateCoinbasePortfolio();
+        portal.showSuccess('Coinbase data updated successfully');
+    }, 1500);
+};
+
+window.toggleCoinbaseFrame = function() {
+    const frameContainer = document.getElementById('coinbase-frame-container');
+    const toggleText = document.getElementById('frame-toggle-text');
+    
+    if (frameContainer.style.display === 'none') {
+        frameContainer.style.display = 'block';
+        toggleText.textContent = 'Hide Coinbase Dashboard';
+        
+        // Load the frame if not already loaded
+        const iframe = document.getElementById('coinbase-frame');
+        if (!iframe.src) {
+            iframe.src = 'https://pro.coinbase.com';
+        }
+        
+        portal.showSuccess('Loading Coinbase dashboard...');
+    } else {
+        frameContainer.style.display = 'none';
+        toggleText.textContent = 'Show Coinbase Dashboard';
+    }
+};
+
+function updateCoinbasePortfolio() {
+    // Simulate real-time portfolio updates
+    const holdings = [
+        { asset: 'BTC', amount: (1.2487 + (Math.random() - 0.5) * 0.01).toFixed(4), value: '$' + (45230 + Math.floor((Math.random() - 0.5) * 1000)).toLocaleString() },
+        { asset: 'ETH', amount: (12.5 + (Math.random() - 0.5) * 0.1).toFixed(1), value: '$' + (28750 + Math.floor((Math.random() - 0.5) * 500)).toLocaleString() },
+        { asset: 'USD', amount: (26020 + Math.floor((Math.random() - 0.5) * 100)).toLocaleString(), value: '$' + (26020 + Math.floor((Math.random() - 0.5) * 100)).toLocaleString() }
+    ];
+    
+    const holdingsList = document.querySelector('.holdings-list');
+    if (holdingsList) {
+        holdingsList.innerHTML = holdings.map(holding => `
+            <div class="holding-item">
+                <span class="asset">${holding.asset}</span>
+                <span class="amount">${holding.amount}</span>
+                <span class="value">${holding.value}</span>
+            </div>
+        `).join('');
+    }
+    
+    // Update account balance
+    const totalValue = holdings.reduce((sum, holding) => {
+        const value = parseFloat(holding.value.replace(/[$,]/g, ''));
+        return sum + value;
+    }, 0);
+    
+    const balanceElement = document.querySelector('.coinbase-card .stat-value');
+    if (balanceElement) {
+        balanceElement.textContent = '$' + totalValue.toLocaleString() + '.00';
+    }
+}
+
 window.saveSettings = function() {
     portal.showSuccess('Settings saved successfully');
 };
@@ -492,6 +562,11 @@ window.resetDefaults = function() {
 // Initialize portal when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     window.portal = new OakDragonPortal();
+    
+    // Initialize Coinbase data
+    setTimeout(() => {
+        updateCoinbasePortfolio();
+    }, 2000);
 });
 
 // Handle page visibility changes

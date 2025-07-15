@@ -58,6 +58,10 @@
                     <i class="fas fa-robot"></i>
                     <span>Automation</span>
                 </button>
+                <button class="tab-button" data-tab="exchanges">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Exchanges</span>
+                </button>
                 <button class="tab-button" data-tab="monitoring">
                     <i class="fas fa-chart-bar"></i>
                     <span>Monitoring</span>
@@ -566,6 +570,146 @@
                                 <span class="log-message">Genesis agent spawned successfully</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Exchanges Tab -->
+            <div class="tab-content" id="exchanges">
+                <div class="section-header">
+                    <h2>Cryptocurrency Exchanges</h2>
+                    <p>Manage your exchange connections and view live account data</p>
+                </div>
+                
+                <div class="exchanges-grid">
+                    <!-- Coinbase Integration -->
+                    <div class="exchange-card coinbase-card">
+                        <div class="exchange-header">
+                            <div class="exchange-logo">
+                                <i class="fab fa-bitcoin" style="color: #0052ff;"></i>
+                                <h3>Coinbase Pro</h3>
+                            </div>
+                            <div class="connection-status connected">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Connected</span>
+                            </div>
+                        </div>
+                        
+                        <div class="exchange-stats">
+                            <div class="stat-item">
+                                <span class="stat-label">Account Balance</span>
+                                <span class="stat-value">$100,000.00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">24h Volume</span>
+                                <span class="stat-value">$2,450.00</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Open Orders</span>
+                                <span class="stat-value">3</span>
+                            </div>
+                        </div>
+                        
+                        <div class="exchange-actions">
+                            <button class="action-btn primary" onclick="openCoinbasePortal()">
+                                <i class="fas fa-external-link-alt"></i>
+                                View Coinbase Dashboard
+                            </button>
+                            <button class="action-btn secondary" onclick="refreshCoinbaseData()">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh Data
+                            </button>
+                        </div>
+                        
+                        <!-- Coinbase Portfolio Preview -->
+                        <div class="portfolio-preview">
+                            <h4>Portfolio Holdings</h4>
+                            <div class="holdings-list">
+                                <div class="holding-item">
+                                    <span class="asset">BTC</span>
+                                    <span class="amount">1.2487</span>
+                                    <span class="value">$45,230</span>
+                                </div>
+                                <div class="holding-item">
+                                    <span class="asset">ETH</span>
+                                    <span class="amount">12.5</span>
+                                    <span class="value">$28,750</span>
+                                </div>
+                                <div class="holding-item">
+                                    <span class="asset">USD</span>
+                                    <span class="amount">26,020</span>
+                                    <span class="value">$26,020</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Other Exchange Placeholders -->
+                    <div class="exchange-card">
+                        <div class="exchange-header">
+                            <div class="exchange-logo">
+                                <i class="fas fa-chart-line" style="color: #f0b90b;"></i>
+                                <h3>Binance</h3>
+                            </div>
+                            <div class="connection-status disconnected">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Not Connected</span>
+                            </div>
+                        </div>
+                        <div class="exchange-actions">
+                            <button class="action-btn secondary" disabled>
+                                <i class="fas fa-plug"></i>
+                                Connect Exchange
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="exchange-card">
+                        <div class="exchange-header">
+                            <div class="exchange-logo">
+                                <i class="fas fa-wave-square" style="color: #5741d9;"></i>
+                                <h3>Kraken</h3>
+                            </div>
+                            <div class="connection-status disconnected">
+                                <i class="fas fa-times-circle"></i>
+                                <span>Not Connected</span>
+                            </div>
+                        </div>
+                        <div class="exchange-actions">
+                            <button class="action-btn secondary" disabled>
+                                <i class="fas fa-plug"></i>
+                                Connect Exchange
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Coinbase Embedded Frame Section -->
+                <div class="coinbase-integration">
+                    <div class="section-header">
+                        <h3>Live Coinbase Account View</h3>
+                        <button class="action-btn primary" onclick="toggleCoinbaseFrame()">
+                            <i class="fas fa-window-maximize"></i>
+                            <span id="frame-toggle-text">Show Coinbase Dashboard</span>
+                        </button>
+                    </div>
+                    
+                    <div class="coinbase-frame-container" id="coinbase-frame-container" style="display: none;">
+                        <div class="frame-header">
+                            <span>Coinbase Pro Dashboard</span>
+                            <button class="close-frame" onclick="toggleCoinbaseFrame()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <iframe 
+                            id="coinbase-frame"
+                            src="https://pro.coinbase.com"
+                            width="100%" 
+                            height="800px"
+                            frameborder="0"
+                            sandbox="allow-same-origin allow-scripts allow-forms"
+                            loading="lazy">
+                        </iframe>
                     </div>
                 </div>
             </div>

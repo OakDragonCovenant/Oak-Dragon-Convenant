@@ -978,3 +978,248 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Exchanges Tab Styles */
+.exchanges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.exchange-card {
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.exchange-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.exchange-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.exchange-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.exchange-logo i {
+    font-size: 1.5rem;
+}
+
+.exchange-logo h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.connection-status.connected {
+    background: rgba(56, 161, 105, 0.1);
+    color: var(--success-color);
+}
+
+.connection-status.disconnected {
+    background: rgba(229, 62, 62, 0.1);
+    color: var(--danger-color);
+}
+
+.exchange-stats {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.exchange-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.action-btn.primary {
+    background: var(--accent-color);
+    color: white;
+}
+
+.action-btn.primary:hover {
+    background: #2c5aa0;
+}
+
+.action-btn.secondary {
+    background: #f7fafc;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.action-btn.secondary:hover {
+    background: #edf2f7;
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.portfolio-preview {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.portfolio-preview h4 {
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.holdings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.holding-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.holding-item .asset {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.holding-item .amount {
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.holding-item .value {
+    color: var(--text-primary);
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Coinbase Integration Frame */
+.coinbase-integration {
+    margin-top: 2rem;
+    background: var(--surface-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+
+.coinbase-frame-container {
+    margin-top: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.frame-header {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 500;
+}
+
+.close-frame {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: background 0.2s ease;
+}
+
+.close-frame:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.coinbase-card {
+    background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+    border: 2px solid #0052ff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .exchanges-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .exchange-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        width: 100%;
+    }
+    
+    .holding-item {
+        grid-template-columns: 1fr;
+        gap: 0.25rem;
+        text-align: left;
+    }
+    
+    .holding-item .amount,
+    .holding-item .value {
+        text-align: left;
+    }
+}
