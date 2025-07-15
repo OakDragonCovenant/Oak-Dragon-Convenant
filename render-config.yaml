@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: oak-dragon-covenant-trader
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ENHANCEMENT_LAYER_ENABLED
+        value: true
+      - key: AI_MODELS_ENABLED
+        value: true
+      - key: PREDICTION_ENGINE_ENABLED
+        value: true
+      - key: AUTOMATION_LEVEL
+        value: balanced
+      - key: SECURITY_MODE
+        value: enhanced
+      - key: DEFAULT_PORTFOLIO_VALUE
+        value: 8.89
+      - key: MICRO_TRADE_ENABLED
+        value: true
+      - key: RISK_LEVEL
+        value: balanced
+      - key: AUTO_TRADING_ENABLED
+        value: true
+    healthCheckPath: /health
+    autoDeploy: true

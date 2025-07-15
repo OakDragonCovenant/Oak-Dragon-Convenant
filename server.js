@@ -12,6 +12,10 @@ const config = require('./config/configManager');
 const logger = require('./utils/logger');
 const errorHandler = require('./utils/errorHandler');
 
+// Cloud Infrastructure
+const healthCheck = require('./health-check');
+const LayeredAgentFramework = require('./OakDragonCovenant/Modules/layeredAgentFramework');
+
 const app = express();
 
 // 🛡️ Security Middleware
@@ -133,18 +137,55 @@ app.get('/api', (req, res) => {
     });
 });
 
-app.get('/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'healthy', 
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        environment: config.server.nodeEnv,
-        systems: {
-            covenant: Covenant ? 'operational' : 'offline',
-            strategos: Strategos ? 'operational' : 'offline'
-        }
-    });
+// Enhanced Health Check for Cloud Deployment
+app.use('/health', healthCheck);
+
+// Enhanced Cloud Trading Dashboard
+app.get('/cloud-status', async (req, res) => {
+    try {
+        // Initialize Cloud Trading Framework
+        const cloudFramework = new LayeredAgentFramework('CloudTrader', 'MSO_TEXAS_LLC');
+        const systemStatus = cloudFramework.getSystemStatus();
+        
+        res.status(200).json({ 
+            status: 'operational',
+            service: 'Oak Dragon Covenant - Coinbase Cloud Trader',
+            version: '2.0.0-enhanced',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            memory: process.memoryUsage(),
+            environment: config.server.nodeEnv,
+            systems: {
+                covenant: Covenant ? 'operational' : 'offline',
+                strategos: Strategos ? 'operational' : 'offline',
+                layeredFramework: 'operational',
+                enhancementLayer: systemStatus.framework.layersActive >= 9 ? 'active' : 'inactive'
+            },
+            trading: {
+                framework: systemStatus.framework,
+                rituals: systemStatus.rituals,
+                capabilities: [
+                    'AI-Powered Trading',
+                    'Multi-Exchange Support', 
+                    'Risk Management',
+                    'Portfolio Optimization',
+                    'Intelligent Automation'
+                ]
+            },
+            cloud: {
+                provider: process.env.CLOUD_PROVIDER || 'local',
+                scaling: process.env.SCALING_MODE || 'manual',
+                region: process.env.CLOUD_REGION || 'unknown'
+            }
+        });
+    } catch (error) {
+        logger.error('Cloud status check failed:', error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Cloud status check failed',
+            timestamp: new Date().toISOString()
+        });
+    }
 });
 
 // --- OAK DRAGON COVENANT API (Real Estate) ---

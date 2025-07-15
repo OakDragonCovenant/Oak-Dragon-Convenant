@@ -24,7 +24,47 @@ const Gateway_Coinbase = require('../Exchanges/Gateway_Coinbase');
 class StrategosSystem {
     constructor() {
         this.agents = new Map();
-        console.log("Strategos Protocol System initialized.");
+        this.riskProfiles = this.initializeRiskProfiles();
+        this.ultraMicroConfig = this.initializeUltraMicroConfig();
+        this.extremeRiskConfig = this.initializeExtremeRiskConfig();
+        console.log("🐉 Strategos Protocol System initialized with Ultra-Micro & Extreme Risk capabilities.");
+    }
+
+    initializeRiskProfiles() {
+        return {
+            ULTRA_CONSERVATIVE: { maxRisk: 0.001, maxPosition: 0.01 },  // 0.1% risk, 1% position
+            CONSERVATIVE: { maxRisk: 0.02, maxPosition: 0.15 },          // 2% risk, 15% position  
+            MODERATE: { maxRisk: 0.05, maxPosition: 0.25 },              // 5% risk, 25% position
+            AGGRESSIVE: { maxRisk: 0.10, maxPosition: 0.50 },            // 10% risk, 50% position
+            EXTREME_HIGH_RISK: { maxRisk: 0.50, maxPosition: 0.90 },     // 50% risk, 90% position
+            ULTRA_HIGH_RISK: { maxRisk: 0.80, maxPosition: 0.95 },       // 80% risk, 95% position
+            MAXIMUM_RISK: { maxRisk: 1.00, maxPosition: 1.00 }           // 100% risk, 100% position
+        };
+    }
+
+    initializeUltraMicroConfig() {
+        return {
+            enabled: true,
+            dustThreshold: 0.0000001,        // Ultra-micro minimum
+            ultraMicroThreshold: 0.001,      // Ultra-micro classification
+            precisionMode: 'ultra',          // Ultra precision mode
+            maxDecimalPlaces: 8,             // 8-decimal precision
+            microPortfolioOptimization: true // Optimize for small accounts
+        };
+    }
+
+    initializeExtremeRiskConfig() {
+        return {
+            enabled: true,
+            leverageAllowed: true,
+            maxLeverage: 10,                 // 10x leverage for extreme trades
+            stopLossRequired: false,         // Allow no-stop-loss trades
+            emergencyStopEnabled: true,      // Emergency stop at 95% loss
+            extremePositionSizing: true,     // Allow 90%+ position sizes
+            highVolatilityTargets: true,     // Target volatile assets
+            moonShotMode: true,              // All-in moonshot capability
+            riskWarnings: true               // Show extreme risk warnings
+        };
     }
     
     spawnAgent(AgentClass, name, config = {}) {
