@@ -15,16 +15,16 @@ try {
     $healthResponse = Invoke-WebRequest -Uri "$Url/health" -UseBasicParsing -ErrorAction Stop
     if ($healthResponse.StatusCode -eq 200) {
         Write-Host "✅ Health check passed!" -ForegroundColor Green
-        Write-Host "📊 Response:" -ForegroundColor White
+        Write-Host "Response:" -ForegroundColor White
         $healthContent = $healthResponse.Content | ConvertFrom-Json
         $healthContent | ConvertTo-Json -Depth 3
         
         # Check system status
         if ($healthContent.systems.covenant -eq "operational") {
-            Write-Host "✅ Covenant system operational" -ForegroundColor Green
+            Write-Host "Covenant system operational" -ForegroundColor Green
         }
         if ($healthContent.systems.strategos -eq "operational") {
-            Write-Host "✅ Strategos system operational" -ForegroundColor Green
+            Write-Host "Strategos system operational" -ForegroundColor Green
         }
     }
 } catch {
@@ -75,11 +75,11 @@ Write-Host ""
 # Summary
 Write-Host "📋 DEPLOYMENT SUMMARY" -ForegroundColor Cyan
 Write-Host "=====================" -ForegroundColor Cyan
-Write-Host "🌐 URL: $Url" -ForegroundColor White
-Write-Host "🏥 Health: Testing completed" -ForegroundColor White
-Write-Host "🏠 Main Page: Testing completed" -ForegroundColor White
-Write-Host "💰 Trading System: Ready for testing" -ForegroundColor White
-Write-Host "🔐 Auto-Trading: DISABLED (safe)" -ForegroundColor Green
+Write-Host "URL: $Url" -ForegroundColor White
+Write-Host "Health: Testing completed" -ForegroundColor White
+Write-Host "Main Page: Testing completed" -ForegroundColor White
+Write-Host "Trading System: Ready for testing" -ForegroundColor White
+Write-Host "Auto-Trading: DISABLED (safe)" -ForegroundColor Green
 Write-Host ""
 Write-Host "🎯 Next Steps:" -ForegroundColor Yellow
 Write-Host "   1. If all tests pass, your deployment is successful!" -ForegroundColor White

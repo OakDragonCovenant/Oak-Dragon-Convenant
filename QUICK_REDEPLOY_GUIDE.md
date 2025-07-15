@@ -62,9 +62,17 @@ COINBASE_PASSPHRASE=Lovehertodeath515!
 1. **Deploy** the service
 2. **Wait** for deployment to complete (5-10 minutes)
 3. **Test** your endpoints:
-   - Main site: `https://your-new-service.onrender.com`
-   - Health check: `https://your-new-service.onrender.com/health`
-   - API test: `https://your-new-service.onrender.com/api/covenant/fund-status`
+   - **Landing page**: `https://your-new-service.onrender.com` (main entry)
+   - **Dashboard**: `https://your-new-service.onrender.com/dashboard` (control panel)
+   - **Health check**: `https://your-new-service.onrender.com/health`
+   - **API test**: `https://your-new-service.onrender.com/api/covenant/fund-status`
+
+### 🎨 Landing Page Features
+Your deployment includes a professional landing page with:
+- **Matrix-style background effects**
+- **Secure authentication portal**
+- **Elite financial intelligence branding**
+- **Responsive design with modern UI**
 
 ## ✅ Step 5: Update Domain (Optional)
 
@@ -76,7 +84,15 @@ If you want to keep using `https://oakdragoncovenant.com`:
 
 ## 🔥 What You Should See After Deployment
 
-**Successful Health Check Response:**
+### 🏠 Landing Page (Main URL)
+Your main URL will show a professional landing page with:
+- **Matrix-style animated background**
+- **"Oak Dragon Covenant" branding**
+- **"Elite Financial Intelligence Platform" tagline**
+- **Secure authentication portal**
+
+### 🏥 Health Check Response
+`/health` endpoint should return:
 ```json
 {
   "status": "healthy",
@@ -89,6 +105,10 @@ If you want to keep using `https://oakdragoncovenant.com`:
   }
 }
 ```
+
+### 🎛️ Dashboard Access
+- **URL**: `/dashboard` - Full command center interface
+- **Features**: Live trading controls, portfolio management, agent status
 
 ## 🚨 SAFETY NOTES
 
