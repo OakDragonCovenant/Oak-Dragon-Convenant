@@ -1,4 +1,4 @@
-const FundManagerAgent = require('./fundManagerAgent');
+const FundManagerAgent = require('./FundManagerAgent');
 
 console.log("--- Testing Upgraded Fund Manager Agent ---");
 
