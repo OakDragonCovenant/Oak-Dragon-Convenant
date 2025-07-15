@@ -93,16 +93,30 @@ async function initializeSystems() {
 // Initialize systems
 initializeSystems();
 
-// --- Health Check & Status Endpoints ---
+// --- Static Files & Landing Page ---
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Authentication Routes ---
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+
+// --- Landing Page Routes ---
 app.get('/', (req, res) => {
-    logger.info('API Request', {
-        service: 'oak-dragon-covenant',
+    logger.info('Landing page request', {
         method: req.method,
         url: req.url,
         userAgent: req.get('User-Agent'),
         ip: req.ip
     });
     
+    res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+app.get('/landing', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+});
+
+app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 

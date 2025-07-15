@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oak Dragon Covenant | Elite Financial Intelligence Platform</title>
+    <meta name="description" content="Advanced AI-driven cryptocurrency trading and real estate investment platform">
+    <meta name="robots" content="noindex, nofollow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/css/landing.css" as="style">
+    <link rel="preload" href="/js/matrix-background.js" as="script">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/landing.css">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+</head>
+<body>
+    <!-- Matrix Background Canvas -->
+    <canvas id="matrix-canvas"></canvas>
+    
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <span class="dragon-symbol">🐉</span>
+                    <h1 class="logo-text">Oak Dragon Covenant</h1>
+                </div>
+                <p class="tagline">Elite Financial Intelligence Platform</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Login Form -->
+            <div class="auth-container" id="authContainer">
+                <div class="auth-card">
+                    <div class="auth-header">
+                        <h2>Secure Access Portal</h2>
+                        <p>Enter the covenant to unlock advanced financial intelligence</p>
+                    </div>
+                    
+                    <form class="auth-form" id="loginForm">
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" id="username" name="username" required autocomplete="username">
+                            <div class="input-glow"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input type="password" id="password" name="password" required autocomplete="current-password">
+                            <div class="input-glow"></div>
+                        </div>
+                        
+                        <button type="submit" class="auth-button">
+                            <span class="button-text">Enter Covenant</span>
+                            <span class="button-glow"></span>
+                        </button>
+                    </form>
+                    
+                    <div class="auth-footer">
+                        <p class="error-message" id="errorMessage"></p>
+                        <p class="security-notice">🛡️ Secured by military-grade encryption</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Preview (hidden initially) -->
+            <div class="dashboard-preview" id="dashboardPreview" style="display: none;">
+                <div class="welcome-message">
+                    <h2>Welcome to the Oak Dragon Covenant</h2>
+                    <p>Financial Intelligence Dashboard Initializing...</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Portfolio Value</h3>
+                        <p class="stat-value" id="portfolioValue">$Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Active Strategies</h3>
+                        <p class="stat-value" id="activeStrategies">Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Real Estate Holdings</h3>
+                        <p class="stat-value" id="realEstateValue">$Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>System Status</h3>
+                        <p class="stat-value status-active">OPERATIONAL</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="window.location.href='/dashboard'">
+                        Enter Full Dashboard
+                    </button>
+                    <button class="action-btn secondary" onclick="logout()">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2025 Oak Dragon Covenant. Advanced Financial Intelligence Platform.</p>
+                <div class="footer-links">
+                    <a href="/terms" class="footer-link">Terms</a>
+                    <a href="/privacy" class="footer-link">Privacy</a>
+                    <a href="/security" class="footer-link">Security</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <p>Authenticating...</p>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/js/matrix-background.js"></script>
+    <script src="/js/landing-auth.js"></script>
+    <script src="/js/landing-effects.js"></script>
+</body>
+</html>

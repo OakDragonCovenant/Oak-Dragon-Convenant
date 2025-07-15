@@ -1,0 +1,30 @@
+# 🏰 Oak Dragon Covenant - Development Override
+version: '3.8'
+
+services:
+  oak-dragon-app:
+    build:
+      target: builder  # Use builder stage for development
+    environment:
+      - NODE_ENV=development
+      - LOG_LEVEL=debug
+      - AUTO_TRADING_ENABLED=false
+      - COINBASE_SANDBOX=true
+    volumes:
+      # Mount source code for development
+      - .:/app
+      - /app/node_modules
+      - ./logs:/app/logs
+    command: ["npm", "run", "dev"]  # Use development server
+    ports:
+      - "3000:3000"
+      - "9229:9229"  # Debug port
+
+  # Remove resource limits for development
+  redis:
+    deploy:
+      resources: {}
+
+# Disable nginx in development
+profiles:
+  - dev
