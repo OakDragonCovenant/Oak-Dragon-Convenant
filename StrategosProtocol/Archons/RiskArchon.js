@@ -1,35 +1,77 @@
 const BaseAgent = require('../Core/BaseAgent');
 
 /**
- * The ultimate authority on risk. Enforces capital preservation rules on all operations.
+ * 🛡️ Enhanced Risk Archon - Optimized for Small Account Trading
+ * Protects $8.89 USDT starting capital with smart risk management
  */
 class RiskArchon extends BaseAgent {
     constructor(name) {
         super(name, "Risk Archon");
-        this.maxRiskPerTrade = 0.02; // Do not risk more than 2% of portfolio on a single trade
-        this.maxOpenPositions = 10;  // Do not allow more than 10 concurrent trades
+        
+        // 🎯 Small Account Risk Management
+        this.maxRiskPerTrade = 0.30; // Allow up to 30% risk for small accounts to enable growth
+        this.maxOpenPositions = 5;   // Limit concurrent positions for small accounts
+        this.minTradeSize = 0.50;    // Coinbase minimum
+        this.emergencyStopLoss = 0.50; // Stop trading if balance falls below $0.50
+        
         console.log(`${this.name}: Risk management protocols active. Max risk per trade: ${this.maxRiskPerTrade * 100}%`);
+        console.log(`${this.name}: Small account optimization: Min trade $${this.minTradeSize}, Emergency stop at $${this.emergencyStopLoss}`);
     }
 
     /**
-     * Validates a proposed trade against all risk rules.
-     * @param {object} proposedTrade - e.g., { symbol: 'BTC/USDT', value: 1500 }
-     * @param {object} portfolioState - The current state from the PortfolioArchon.
-     * @returns {object} An object indicating approval status and reason.
+     * Enhanced trade validation for small accounts
+     * @param {object} proposedTrade - e.g., { symbol: 'ADA/USDT', value: 1.50 }
+     * @param {object} portfolioState - Current portfolio state
+     * @returns {object} Approval status and detailed reasoning
      */
     validateTrade(proposedTrade, portfolioState) {
-        const tradeRisk = proposedTrade.value / portfolioState.totalValueUSD;
-
-        if (tradeRisk > this.maxRiskPerTrade) {
+        // 🚨 Emergency Stop Check
+        if (portfolioState.cashUSD < this.emergencyStopLoss) {
             return {
                 approved: false,
-                reason: `Trade risk (${(tradeRisk * 100).toFixed(2)}%) exceeds max risk of ${(this.maxRiskPerTrade * 100)}%`
+                reason: `🚨 EMERGENCY STOP: Balance $${portfolioState.cashUSD.toFixed(2)} below emergency threshold $${this.emergencyStopLoss}`
             };
         }
 
-        // Add more rule checks here in the future...
+        // 💰 Minimum Trade Size Check
+        if (proposedTrade.value < this.minTradeSize) {
+            return {
+                approved: false,
+                reason: `Trade value $${proposedTrade.value.toFixed(2)} below Coinbase minimum $${this.minTradeSize}`
+            };
+        }
 
-        return { approved: true };
+        // 📊 Portfolio Risk Check (relaxed for small accounts)
+        const tradeRisk = proposedTrade.value / portfolioState.totalValueUSD;
+        if (tradeRisk > this.maxRiskPerTrade) {
+            return {
+                approved: false,
+                reason: `Trade risk ${(tradeRisk * 100).toFixed(1)}% exceeds max ${(this.maxRiskPerTrade * 100)}%`
+            };
+        }
+
+        // 🎯 Position Count Check
+        const currentPositions = Object.keys(portfolioState.holdings).length;
+        if (currentPositions >= this.maxOpenPositions) {
+            return {
+                approved: false,
+                reason: `Max positions (${this.maxOpenPositions}) reached. Current: ${currentPositions}`
+            };
+        }
+
+        // 💵 Cash Availability Check
+        if (proposedTrade.side === 'BUY' && proposedTrade.value > portfolioState.cashUSD) {
+            return {
+                approved: false,
+                reason: `Insufficient cash: Need $${proposedTrade.value.toFixed(2)}, have $${portfolioState.cashUSD.toFixed(2)}`
+            };
+        }
+
+        // ✅ All checks passed
+        return { 
+            approved: true,
+            reason: `Trade approved: ${proposedTrade.symbol} ${proposedTrade.side} $${proposedTrade.value.toFixed(2)}`
+        };
     }
 }
 

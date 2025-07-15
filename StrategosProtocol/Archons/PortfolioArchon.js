@@ -7,9 +7,10 @@ const BaseAgent = require('../Core/BaseAgent');
 class PortfolioArchon extends BaseAgent {
     constructor(name) {
         super(name, "Portfolio Archon");
-        this.cashUSD = 100000; // --- UPGRADE: Explicitly track liquid capital.
+        // Initialize with actual Coinbase USDT balance
+        this.cashUSD = 8.89; // Real USDT balance from Coinbase account
         this.holdings = new Map(); // Map<string, { quantity: number, avgPrice: number, value: number }>
-        console.log(`${this.name}: Portfolio management initialized. Initial capital: $${this.cashUSD.toLocaleString()}`);
+        console.log(`${this.name}: Portfolio management initialized. Initial capital: $${this.cashUSD.toLocaleString()} USDT`);
     }
 
     /**

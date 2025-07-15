@@ -45,6 +45,7 @@ class StrategosSystem {
         // 🔥 LIVE TRADING: Use Coinbase Gateway instead of Mock
         const coinbaseGateway = this.spawnAgent(Gateway_Coinbase, AgentNames.Gateway);
         console.log("⚡ LIVE TRADING MODE: Coinbase Gateway activated!");
+        console.log("🎯 Small Account Mode: Optimized for $8.89 USDT starting balance");
         
         const taLegate = this.spawnAgent(TA_Legate, AgentNames.TA);
         const llmOracle = this.spawnAgent(LLM_Oracle, AgentNames.LLM);
@@ -66,6 +67,7 @@ class StrategosSystem {
         this.spawnAgent(AdaptationArchon, AgentNames.Adaptation);
 
         console.log("🎯 Strategos LIVE TRADING boot sequence complete. All Tiers active and connected to Coinbase!");
+        console.log("💰 Ready to trade with 8 optimized cryptocurrency pairs using $8.89 USDT balance!");
     }
 }
 module.exports = StrategosSystem;
