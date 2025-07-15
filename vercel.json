@@ -1,0 +1,94 @@
+{
+  "version": 2,
+  "name": "oak-dragon-covenant-dashboard",
+  "alias": [
+    "dashboard.oakdragoncovenant.com",
+    "command.oakdragoncovenant.com",
+    "divisions.oakdragoncovenant.com",
+    "portal.oakdragoncovenant.com"
+  ],
+  "builds": [
+    {
+      "src": "public/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/dashboard",
+      "dest": "/public/landing.html"
+    },
+    {
+      "src": "/command",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/divisions",
+      "dest": "/public/divisions.html"
+    },
+    {
+      "src": "/portal",
+      "dest": "/public/landing.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/health",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/public/$1"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "3000",
+    "DOMAIN": "oakdragoncovenant.com"
+  },
+  "regions": ["iad1", "sfo1"],
+  "functions": {
+    "server.js": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/dashboard/(.*)",
+      "destination": "/public/landing.html"
+    },
+    {
+      "source": "/command/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

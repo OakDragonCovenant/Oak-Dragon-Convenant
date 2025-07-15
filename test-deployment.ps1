@@ -1,13 +1,43 @@
-# Oak Dragon Covenant - Deployment Verification Script (PowerShell)
-param(
-    [Parameter(Mandatory=$true)]
-    [string]$Url
-)
+# 🔍 Oak Dragon Covenant - Complete Deployment Tester
 
-Write-Host "Oak Dragon Covenant - Deployment Verification" -ForegroundColor Cyan
-Write-Host "=============================================" -ForegroundColor Cyan
-Write-Host "Testing deployment at: $Url" -ForegroundColor Yellow
-Write-Host ""
+Write-Host "🧭 Oak Dragon Covenant - DNS & Deployment Tester" -ForegroundColor Yellow
+Write-Host "================================================" -ForegroundColor Cyan
+
+# Function to test URL availability
+function Test-Url($url, $description) {
+    Write-Host "`nTesting: $description" -ForegroundColor White
+    Write-Host "URL: $url" -ForegroundColor Gray
+    
+    try {
+        $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 10
+        if ($response.StatusCode -eq 200) {
+            Write-Host "✅ ONLINE - Status: $($response.StatusCode)" -ForegroundColor Green
+        } else {
+            Write-Host "⚠️ RESPONSE - Status: $($response.StatusCode)" -ForegroundColor Yellow
+        }
+    } catch {
+        Write-Host "❌ OFFLINE - $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+# Function to test DNS resolution
+function Test-DNS($domain) {
+    Write-Host "`nDNS Resolution Test: $domain" -ForegroundColor White
+    
+    try {
+        $dnsResult = Resolve-DnsName -Name $domain -ErrorAction Stop
+        Write-Host "✅ DNS RESOLVED" -ForegroundColor Green
+        foreach ($record in $dnsResult) {
+            if ($record.Type -eq "A") {
+                Write-Host "   A Record: $($record.IPAddress)" -ForegroundColor Gray
+            } elseif ($record.Type -eq "CNAME") {
+                Write-Host "   CNAME: $($record.NameHost)" -ForegroundColor Gray
+            }
+        }
+    } catch {
+        Write-Host "❌ DNS NOT RESOLVED" -ForegroundColor Red
+    }
+}
 
 # Test 1: Health Check
 Write-Host "Testing Health Endpoint..." -ForegroundColor Green

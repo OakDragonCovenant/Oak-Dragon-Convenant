@@ -1,0 +1,650 @@
+/* Oak Dragon Covenant - Division Command Center Styles */
+
+:root {
+    --covenant-gold: #FFD700;
+    --covenant-silver: #C0C0C0;
+    --covenant-bronze: #CD7F32;
+    --covenant-dark: #1a1a1a;
+    --covenant-darker: #0d1117;
+    --covenant-accent: #8B4513;
+    --success-green: #28a745;
+    --warning-orange: #fd7e14;
+    --danger-red: #dc3545;
+    --info-blue: #17a2b8;
+}
+
+.division-command-center {
+    background: linear-gradient(135deg, var(--covenant-darker) 0%, var(--covenant-dark) 100%);
+    min-height: 100vh;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+/* Command Header */
+.command-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 20px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 15px;
+    border: 2px solid var(--covenant-gold);
+}
+
+.covenant-title {
+    font-size: 2.5rem;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, var(--covenant-gold), var(--covenant-silver));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.system-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--covenant-gold);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Division Buttons Grid */
+.divisions-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.division-button {
+    background: rgba(0, 0, 0, 0.6);
+    border: 3px solid transparent;
+    border-radius: 15px;
+    padding: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.division-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.division-button:hover::before {
+    left: 100%;
+}
+
+.division-button:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border-color: inherit;
+}
+
+.division-glyph {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.division-name {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.division-entity-count {
+    font-size: 0.9rem;
+    color: var(--covenant-gold);
+    margin-bottom: 10px;
+}
+
+.division-description {
+    font-size: 0.85rem;
+    color: #cccccc;
+    line-height: 1.4;
+}
+
+/* Division View */
+.division-view {
+    animation: slideIn 0.3s ease-out;
+}
+
+.division-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.division-title {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.division-title h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: var(--covenant-gold);
+}
+
+.back-button, .add-entity-button {
+    background: linear-gradient(45deg, var(--covenant-gold), var(--covenant-bronze));
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    color: var(--covenant-dark);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.back-button:hover, .add-entity-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+}
+
+/* Entity Filters */
+.entity-filters {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.entity-filters select, .entity-filters input {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+    padding: 10px 15px;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.entity-filters select:focus, .entity-filters input:focus {
+    outline: none;
+    border-color: var(--covenant-gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* Entities Grid */
+.entities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.entity-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(255, 215, 0, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.entity-card:hover {
+    border-color: var(--covenant-gold);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.entity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.entity-name {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--covenant-gold);
+}
+
+.entity-status {
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background: var(--success-green);
+    color: white;
+}
+
+.status-dormant {
+    background: var(--warning-orange);
+    color: white;
+}
+
+.status-pending {
+    background: var(--info-blue);
+    color: white;
+}
+
+.entity-details {
+    margin-bottom: 15px;
+}
+
+.entity-details div {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #cccccc;
+}
+
+.entity-agents, .entity-activity {
+    font-size: 0.85rem;
+    color: var(--covenant-silver);
+    margin-bottom: 5px;
+}
+
+/* Entity View */
+.entity-view {
+    animation: slideIn 0.3s ease-out;
+}
+
+.entity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 10px;
+}
+
+.entity-title h2 {
+    margin: 0;
+    color: var(--covenant-gold);
+    font-size: 1.6rem;
+}
+
+.entity-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.action-button {
+    background: linear-gradient(45deg, var(--covenant-silver), var(--covenant-bronze));
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    color: var(--covenant-dark);
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(192, 192, 192, 0.4);
+}
+
+/* Entity Tabs */
+.entity-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 25px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.tab-button {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 12px 20px;
+    border-radius: 8px 8px 0 0;
+    color: #cccccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.tab-button.active {
+    background: var(--covenant-gold);
+    color: var(--covenant-dark);
+    border-color: var(--covenant-gold);
+}
+
+.tab-button:hover:not(.active) {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--covenant-gold);
+}
+
+/* Tab Content */
+.entity-content {
+    position: relative;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.overview-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.overview-card h3 {
+    margin: 0 0 15px 0;
+    color: var(--covenant-gold);
+    font-size: 1.1rem;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.detail-row span:first-child {
+    color: #cccccc;
+    font-weight: 500;
+}
+
+.detail-row span:last-child {
+    color: var(--covenant-gold);
+}
+
+.agents-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.agent-tag {
+    background: linear-gradient(45deg, var(--covenant-bronze), var(--covenant-gold));
+    color: var(--covenant-dark);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.activities-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+}
+
+.activity-time {
+    font-size: 0.8rem;
+    color: var(--covenant-silver);
+    margin-bottom: 5px;
+}
+
+.activity-description {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin-bottom: 3px;
+}
+
+.activity-agent {
+    font-size: 0.8rem;
+    color: var(--covenant-gold);
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.modal-content {
+    background: linear-gradient(135deg, var(--covenant-darker) 0%, var(--covenant-dark) 100%);
+    border: 2px solid var(--covenant-gold);
+    border-radius: 15px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--covenant-gold);
+    font-size: 1.4rem;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #cccccc;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.close-button:hover {
+    color: var(--covenant-gold);
+}
+
+/* Form Styles */
+.entity-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: var(--covenant-gold);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input, .form-group select {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    border-radius: 8px;
+    padding: 12px 15px;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.form-group input:focus, .form-group select:focus {
+    outline: none;
+    border-color: var(--covenant-gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.form-actions button {
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.form-actions button[type="button"] {
+    background: rgba(108, 117, 125, 0.8);
+    color: #ffffff;
+}
+
+.form-actions button[type="submit"] {
+    background: linear-gradient(45deg, var(--covenant-gold), var(--covenant-bronze));
+    color: var(--covenant-dark);
+}
+
+.form-actions button:hover {
+    transform: translateY(-2px);
+}
+
+/* Empty States */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: #cccccc;
+}
+
+.empty-glyph {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.6;
+}
+
+.empty-state h3 {
+    margin: 0 0 10px 0;
+    color: var(--covenant-gold);
+}
+
+.empty-message {
+    color: #999999;
+    font-style: italic;
+    padding: 20px;
+    text-align: center;
+}
+
+.placeholder-message {
+    color: #999999;
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed rgba(255, 215, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .divisions-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .entities-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .overview-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .division-header, .entity-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .entity-filters {
+        flex-direction: column;
+    }
+    
+    .system-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .entity-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .covenant-title {
+        font-size: 2rem;
+    }
+}

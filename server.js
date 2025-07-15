@@ -15,6 +15,7 @@ const errorHandler = require('./utils/errorHandler');
 // Cloud Infrastructure
 const healthCheck = require('./health-check');
 const LayeredAgentFramework = require('./OakDragonCovenant/Modules/layeredAgentFramework');
+const RenderWebsiteControlAgent = require('./agents/renderWebsiteControlAgent');
 
 const app = express();
 
@@ -32,7 +33,17 @@ app.use(helmet({
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://your-domain.com'] 
+        ? [
+            'https://oakdragoncovenant.com',
+            'https://www.oakdragoncovenant.com',
+            'https://trading.oakdragoncovenant.com',
+            'https://dashboard.oakdragoncovenant.com',
+            'https://api.oakdragoncovenant.com',
+            'https://command.oakdragoncovenant.com',
+            'https://portal.oakdragoncovenant.com',
+            'https://monitor.oakdragoncovenant.com',
+            'https://divisions.oakdragoncovenant.com'
+        ] 
         : ['http://localhost:3000', 'http://127.0.0.1:3000'],
     credentials: true
 }));
@@ -67,7 +78,7 @@ app.use((req, res, next) => {
 });
 
 // --- Initialize Systems ---
-let Covenant, Strategos;
+let Covenant, Strategos, RenderAgent;
 
 async function initializeSystems() {
     try {
@@ -85,6 +96,12 @@ async function initializeSystems() {
         await Strategos.boot();
         logger.info('✅ Strategos Protocol initialized successfully');
 
+        // Initialize Render Website Control Agent
+        logger.info('--- Initializing Render Website Control Agent ---');
+        RenderAgent = new RenderWebsiteControlAgent();
+        logger.info('✅ Render Website Control Agent initialized successfully');
+        logger.info('🌐 Website deployment and Strategos integration active');
+
         logger.info('🎯 All systems operational and ready for service');
     } catch (error) {
         logger.error('❌ System initialization failed', error);
@@ -100,9 +117,81 @@ initializeSystems();
 // --- Static Files & Landing Page ---
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 🌐 Domain-based routing middleware
+app.use((req, res, next) => {
+    const host = req.get('host') || '';
+    const subdomain = host.split('.')[0];
+    
+    // Add subdomain info to request for routing decisions
+    req.subdomain = subdomain;
+    req.domain = host;
+    
+    // Log domain routing for debugging
+    logger.info(`Domain routing: ${host} -> subdomain: ${subdomain}`);
+    
+    next();
+});
+
+// 🌐 Subdomain-specific routing
+app.use((req, res, next) => {
+    const subdomain = req.subdomain;
+    
+    switch (subdomain) {
+        case 'trading':
+            // Trading dashboard routes
+            if (req.path === '/' || req.path === '') {
+                return res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+            }
+            break;
+            
+        case 'dashboard':
+        case 'command':
+            // Command center dashboard routes
+            if (req.path === '/' || req.path === '') {
+                return res.sendFile(path.join(__dirname, 'index.html'));
+            }
+            break;
+            
+        case 'divisions':
+            // Division command center routes
+            if (req.path === '/' || req.path === '') {
+                return res.sendFile(path.join(__dirname, 'public', 'divisions.html'));
+            }
+            break;
+            
+        case 'portal':
+            // Member portal routes
+            if (req.path === '/' || req.path === '') {
+                return res.sendFile(path.join(__dirname, 'public', 'landing.html'));
+            }
+            break;
+            
+        case 'api':
+            // API routes - handle in regular routing
+            break;
+            
+        case 'monitor':
+            // Monitoring routes
+            if (req.path === '/' || req.path === '') {
+                return res.redirect('/cloud-status');
+            }
+            break;
+            
+        default:
+            // Main domain or www - continue to regular routing
+            break;
+    }
+    
+    next();
+});
+
 // --- Authentication Routes ---
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
+
+// --- Division Command Center Routes ---
+const divisionRoutes = require('./routes/divisions');
+app.use('/api/divisions', divisionRoutes);
 
 // --- Landing Page Routes ---
 app.get('/', (req, res) => {
@@ -122,6 +211,11 @@ app.get('/landing', (req, res) => {
 
 app.get('/dashboard', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Division Command Center Route
+app.get('/divisions', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'divisions.html'));
 });
 
 app.get('/api', (req, res) => {
@@ -147,6 +241,9 @@ app.get('/cloud-status', async (req, res) => {
         const cloudFramework = new LayeredAgentFramework('CloudTrader', 'MSO_TEXAS_LLC');
         const systemStatus = cloudFramework.getSystemStatus();
         
+        // Get Render Agent status if available
+        const renderStatus = RenderAgent ? RenderAgent.getSystemStatus() : null;
+        
         res.status(200).json({ 
             status: 'operational',
             service: 'Oak Dragon Covenant - Coinbase Cloud Trader',
@@ -159,6 +256,7 @@ app.get('/cloud-status', async (req, res) => {
                 covenant: Covenant ? 'operational' : 'offline',
                 strategos: Strategos ? 'operational' : 'offline',
                 layeredFramework: 'operational',
+                renderAgent: RenderAgent ? 'active' : 'inactive',
                 enhancementLayer: systemStatus.framework.layersActive >= 9 ? 'active' : 'inactive'
             },
             trading: {
@@ -172,6 +270,16 @@ app.get('/cloud-status', async (req, res) => {
                     'Intelligent Automation'
                 ]
             },
+            website: renderStatus ? {
+                deployed: renderStatus.website.deployed,
+                platform: renderStatus.website.platform,
+                uptime: renderStatus.website.uptime,
+                integrations: renderStatus.integrations
+            } : {
+                deployed: false,
+                platform: 'render',
+                status: 'agent-not-initialized'
+            },
             cloud: {
                 provider: process.env.CLOUD_PROVIDER || 'local',
                 scaling: process.env.SCALING_MODE || 'manual',
@@ -184,6 +292,203 @@ app.get('/cloud-status', async (req, res) => {
             status: 'error',
             message: 'Cloud status check failed',
             timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// --- RENDER WEBSITE CONTROL API ---
+const websiteRouter = express.Router();
+app.use('/api/website', websiteRouter);
+
+websiteRouter.get('/status', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Render Agent not initialized'
+            });
+        }
+
+        const status = await RenderAgent.executeRitual('!website status');
+        res.json(status);
+        
+    } catch (error) {
+        logger.error('Website status check failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+websiteRouter.post('/deploy', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Render Agent not initialized'
+            });
+        }
+
+        const { environment = 'production', platform = 'render' } = req.body;
+        const deployment = await RenderAgent.executeRitual(
+            `!deploy website --platform=${platform} --environment=${environment}`
+        );
+        
+        res.json(deployment);
+        
+    } catch (error) {
+        logger.error('Website deployment failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+websiteRouter.get('/monitor', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Render Agent not initialized'
+            });
+        }
+
+        const monitoring = await RenderAgent.executeRitual('!monitor website --metrics=all --alerts=standard');
+        res.json(monitoring);
+        
+    } catch (error) {
+        logger.error('Website monitoring failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+// --- STRATEGOS TRADING API ---
+const tradingRouter = express.Router();
+app.use('/api/trading', tradingRouter);
+
+tradingRouter.get('/status', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Trading agent not available'
+            });
+        }
+
+        const systemStatus = RenderAgent.getSystemStatus();
+        const tradingStatus = {
+            strategos: systemStatus.strategos,
+            framework: systemStatus.framework,
+            website: systemStatus.website,
+            integrations: systemStatus.integrations,
+            timestamp: new Date().toISOString()
+        };
+        
+        res.json({
+            success: true,
+            trading: tradingStatus
+        });
+        
+    } catch (error) {
+        logger.error('Trading status check failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+tradingRouter.post('/execute', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Trading agent not available'
+            });
+        }
+
+        const { ritual } = req.body;
+        if (!ritual) {
+            return res.status(400).json({
+                success: false,
+                error: 'Ritual command required'
+            });
+        }
+
+        const result = await RenderAgent.executeRitual(ritual);
+        res.json({
+            success: true,
+            result
+        });
+        
+    } catch (error) {
+        logger.error('Trading execution failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+tradingRouter.get('/coinbase', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Trading agent not available'
+            });
+        }
+
+        const stats = await RenderAgent.executeRitual('!microtrade stats --portfolio=8.89');
+        const recommendations = await RenderAgent.executeRitual('!microtrade recommendations --portfolio=8.89 --symbols=BTC/USD,ETH/USD');
+        
+        res.json({
+            success: true,
+            coinbase: {
+                statistics: stats,
+                recommendations: recommendations,
+                timestamp: new Date().toISOString()
+            }
+        });
+        
+    } catch (error) {
+        logger.error('Coinbase data retrieval failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
+tradingRouter.post('/enhance', async (req, res) => {
+    try {
+        if (!RenderAgent) {
+            return res.status(503).json({
+                success: false,
+                error: 'Enhancement agent not available'
+            });
+        }
+
+        const { feature = 'trading', mode = 'balanced', target = 'profitability' } = req.body;
+        const enhancement = await RenderAgent.executeRitual(
+            `!enhance ${feature} --mode=${mode} --target=${target}`
+        );
+        
+        res.json({
+            success: true,
+            enhancement
+        });
+        
+    } catch (error) {
+        logger.error('Trading enhancement failed:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
         });
     }
 });

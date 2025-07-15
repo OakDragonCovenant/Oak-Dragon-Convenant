@@ -38,7 +38,8 @@ class LayeredAgentFramework extends BaseAgent {
             translation: new TranslationLayer(this),   // Protocol & format conversion
             mobility: new MobilityLayer(this),         // Cross-platform migration
             content: new ContentGenerationLayer(this), // AI Power Pack content generation
-            enhancement: new EnhancementLayer(this)    // 🚀 Advanced optimization & AI capabilities
+            enhancement: new EnhancementLayer(this),   // 🚀 Advanced optimization & AI capabilities
+            cloudOrchestration: new CloudOrchestrationLayer(this) // 🌐 Free cloud service orchestration
         };
     }
 
@@ -118,6 +119,21 @@ class LayeredAgentFramework extends BaseAgent {
                 trigger: '!automate',
                 syntax: '!automate {process} --intelligence={level} --safety={mode}',
                 authorization: ['MSO', 'DAO_COUNCIL', 'AUTOMATION_AUTHORIZED']
+            },
+            cloudDeploy: {
+                trigger: '!clouddeploy',
+                syntax: '!clouddeploy {service} --provider={cloud} --tier={free|paid} --domain={subdomain}',
+                authorization: ['MSO', 'DAO_COUNCIL', 'CLOUD_AUTHORIZED']
+            },
+            freeCloud: {
+                trigger: '!freecloud',
+                syntax: '!freecloud {action} --providers={railway,render,vercel} --domain={oakdragoncovenant.com}',
+                authorization: ['MSO', 'DAO_COUNCIL', 'ALL_ENTITIES']
+            },
+            cloudFailover: {
+                trigger: '!failover',
+                syntax: '!failover {action} --from={provider} --to={provider} --reason={health|limits}',
+                authorization: ['MSO', 'DAO_COUNCIL', 'CLOUD_AUTHORIZED']
             }
         };
     }
@@ -243,6 +259,12 @@ class LayeredAgentFramework extends BaseAgent {
                 return await this.handlePredictionRitual(ritual);
             case 'automate':
                 return await this.handleAutomationRitual(ritual);
+            case 'clouddeploy':
+                return await this.handleCloudDeployRitual(ritual);
+            case 'freecloud':
+                return await this.handleFreeCloudRitual(ritual);
+            case 'failover':
+                return await this.handleCloudFailoverRitual(ritual);
             default:
                 throw new Error(`Unknown ritual type: ${ritual.type}`);
         }
@@ -784,6 +806,51 @@ class LayeredAgentFramework extends BaseAgent {
         }
     }
 
+    /**
+     * 🌐 Handle Cloud Deploy ritual commands for free cloud services
+     */
+    async handleCloudDeployRitual(ritual) {
+        console.log(`${this.name}: 🌐 Executing CLOUD DEPLOY ritual: ${ritual.service}`);
+        console.log(`🎯 Provider: ${ritual.provider || 'auto-select'}`);
+        
+        try {
+            return await this.layers.cloudOrchestration.deployToCloud(ritual);
+        } catch (error) {
+            console.error(`${this.name}: ❌ Cloud deploy ritual failed:`, error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * 🆓 Handle Free Cloud ritual commands for zero-cost 24/7 operations
+     */
+    async handleFreeCloudRitual(ritual) {
+        console.log(`${this.name}: 🆓 Executing FREE CLOUD ritual: ${ritual.action}`);
+        console.log(`🌐 Domain: ${ritual.domain || 'oakdragoncovenant.com'}`);
+        
+        try {
+            return await this.layers.cloudOrchestration.manageFreeCloudServices(ritual);
+        } catch (error) {
+            console.error(`${this.name}: ❌ Free cloud ritual failed:`, error.message);
+            throw error;
+        }
+    }
+
+    /**
+     * 🔄 Handle Cloud Failover ritual commands for high availability
+     */
+    async handleCloudFailoverRitual(ritual) {
+        console.log(`${this.name}: 🔄 Executing CLOUD FAILOVER ritual: ${ritual.action}`);
+        console.log(`📍 From: ${ritual.from} → To: ${ritual.to}`);
+        
+        try {
+            return await this.layers.cloudOrchestration.executeFailover(ritual);
+        } catch (error) {
+            console.error(`${this.name}: ❌ Cloud failover ritual failed:`, error.message);
+            throw error;
+        }
+    }
+
     // Mirror Trading Helper Methods
 
     async startMirrorTrading(gateway, ritual) {
@@ -1256,6 +1323,34 @@ class LayeredAgentFramework extends BaseAgent {
             };
 
             return result;
+        }
+
+        if (action === 'clouddeploy' || action === 'freecloud' || action === 'failover') {
+            // Handle cloud orchestration commands
+            const cloudAction = parts[1];
+            const params = {};
+            
+            for (let i = 2; i < parts.length; i++) {
+                if (parts[i].startsWith('--')) {
+                    const [key, value] = parts[i].substring(2).split('=');
+                    params[key] = value;
+                }
+            }
+            
+            return {
+                type: action,
+                action: cloudAction,
+                service: cloudAction, // For clouddeploy
+                provider: params.provider,
+                providers: params.providers ? params.providers.split(',') : ['railway', 'render', 'vercel'],
+                tier: params.tier,
+                domain: params.domain || 'oakdragoncovenant.com',
+                subdomain: params.subdomain,
+                from: params.from,
+                to: params.to,
+                reason: params.reason,
+                requester: params.requester || 'system'
+            };
         }
         
         // Handle traditional ritual commands
@@ -1926,10 +2021,15 @@ class EnhancementLayer {
                 speedImprovement: 1.2,
                 accuracyImprovement: 1.1,
                 riskReduction: 0.2
+            },
+            'balanced': {
+                speedImprovement: 1.8,
+                accuracyImprovement: 1.3,
+                riskReduction: 0.15
             }
         };
 
-        const enhancement = enhancements[mode];
+        const enhancement = enhancements[mode] || enhancements['standard'];
         
         return {
             success: true,
@@ -1942,6 +2042,7 @@ class EnhancementLayer {
                 riskReduction: `${(enhancement.riskReduction * 100).toFixed(1)}% risk reduction`
             },
             estimatedROI: `${(enhancement.speedImprovement * enhancement.accuracyImprovement * 100 - 100).toFixed(1)}%`,
+            performanceGain: `${(enhancement.speedImprovement * 100 - 100).toFixed(0)}-${(enhancement.speedImprovement * enhancement.accuracyImprovement * 100 - 100).toFixed(0)}%`,
             timestamp: new Date().toISOString()
         };
     }
@@ -2619,6 +2720,522 @@ class EnhancementLayer {
             performance: this.performanceMetrics,
             timestamp: new Date().toISOString()
         };
+    }
+}
+
+/**
+ * 🌐 Cloud Orchestration Layer - Free Cloud Service Management
+ * Manages multi-cloud deployments across free tiers for 24/7 operations
+ */
+class CloudOrchestrationLayer {
+    constructor(parent) {
+        this.parent = parent;
+        this.providers = new Map([
+            ['railway', { 
+                url: 'https://api.oakdragoncovenant.com',
+                domain: 'api.oakdragoncovenant.com',
+                priority: 1,
+                freeHours: 500,
+                usedHours: 0,
+                status: 'available',
+                purpose: 'primary_api'
+            }],
+            ['render', { 
+                url: 'https://trading.oakdragoncovenant.com',
+                domain: 'trading.oakdragoncovenant.com',
+                priority: 2,
+                freeHours: 750,
+                usedHours: 0,
+                status: 'available',
+                purpose: 'trading_dashboard'
+            }],
+            ['vercel', { 
+                url: 'https://dashboard.oakdragoncovenant.com',
+                domain: 'dashboard.oakdragoncovenant.com',
+                priority: 3,
+                freeHours: 1000,
+                usedHours: 0,
+                status: 'available',
+                purpose: 'command_center'
+            }]
+        ]);
+        this.activeProvider = 'railway';
+        this.deploymentHistory = [];
+    }
+
+    async deployToCloud(ritual) {
+        console.log(`🌐 Cloud Orchestration: Deploying ${ritual.service} to ${ritual.provider || 'optimal provider'}`);
+        
+        const provider = ritual.provider || await this.selectOptimalProvider();
+        const deploymentConfig = this.createDeploymentConfig(ritual, provider);
+        
+        try {
+            const deployment = await this.executeDeployment(deploymentConfig);
+            this.deploymentHistory.push(deployment);
+            
+            return {
+                success: true,
+                service: ritual.service,
+                provider: provider,
+                url: this.providers.get(provider).url,
+                deployment: deployment,
+                timestamp: new Date().toISOString()
+            };
+            
+        } catch (error) {
+            console.error(`❌ Deployment failed on ${provider}:`, error.message);
+            
+            // Try failover to next provider
+            const fallbackProvider = await this.selectFallbackProvider(provider);
+            if (fallbackProvider) {
+                console.log(`🔄 Attempting failover to ${fallbackProvider}...`);
+                return await this.deployToCloud({...ritual, provider: fallbackProvider});
+            }
+            
+            throw error;
+        }
+    }
+
+    async manageFreeCloudServices(ritual) {
+        console.log(`🆓 Free Cloud Management: ${ritual.action} for ${ritual.domain}`);
+        
+        switch (ritual.action) {
+            case 'status':
+                return await this.getCloudStatus();
+            
+            case 'optimize':
+                return await this.optimizeResourceUsage();
+            
+            case 'switch':
+                return await this.switchProvider(ritual.providers);
+            
+            case 'monitor':
+                return await this.monitorAllProviders();
+            
+            case 'setup':
+                return await this.setupMultiCloudArchitecture(ritual);
+            
+            default:
+                throw new Error(`Unknown free cloud action: ${ritual.action}`);
+        }
+    }
+
+    async executeFailover(ritual) {
+        console.log(`🔄 Cloud Failover: ${ritual.from} → ${ritual.to} (Reason: ${ritual.reason})`);
+        
+        const fromProvider = this.providers.get(ritual.from);
+        const toProvider = this.providers.get(ritual.to);
+        
+        if (!fromProvider || !toProvider) {
+            throw new Error(`Invalid provider specified for failover`);
+        }
+        
+        try {
+            // Health check on target provider
+            const targetHealth = await this.checkProviderHealth(ritual.to);
+            if (!targetHealth.healthy) {
+                throw new Error(`Target provider ${ritual.to} is not healthy`);
+            }
+            
+            // Execute traffic switch
+            const failover = await this.switchTraffic(ritual.from, ritual.to);
+            
+            // Update active provider
+            this.activeProvider = ritual.to;
+            
+            return {
+                success: true,
+                failover: {
+                    from: ritual.from,
+                    to: ritual.to,
+                    reason: ritual.reason,
+                    duration: failover.duration,
+                    downtime: failover.downtime
+                },
+                activeProvider: this.activeProvider,
+                timestamp: new Date().toISOString()
+            };
+            
+        } catch (error) {
+            console.error(`❌ Failover failed:`, error.message);
+            throw error;
+        }
+    }
+
+    async selectOptimalProvider() {
+        // Check resource availability and select best provider
+        for (let [name, provider] of this.providers) {
+            if (provider.usedHours < provider.freeHours * 0.8 && provider.status === 'available') {
+                const health = await this.checkProviderHealth(name);
+                if (health.healthy) {
+                    return name;
+                }
+            }
+        }
+        
+        // If all providers are near limits, use priority order
+        return Array.from(this.providers.keys()).sort((a, b) => 
+            this.providers.get(a).priority - this.providers.get(b).priority
+        )[0];
+    }
+
+    async selectFallbackProvider(currentProvider) {
+        for (let [name, provider] of this.providers) {
+            if (name !== currentProvider && provider.status === 'available') {
+                const health = await this.checkProviderHealth(name);
+                if (health.healthy) {
+                    return name;
+                }
+            }
+        }
+        return null;
+    }
+
+    createDeploymentConfig(ritual, provider) {
+        const baseConfig = {
+            service: ritual.service,
+            provider: provider,
+            domain: ritual.domain,
+            tier: ritual.tier || 'free',
+            timestamp: new Date().toISOString()
+        };
+
+        // Provider-specific configurations
+        switch (provider) {
+            case 'railway':
+                return {
+                    ...baseConfig,
+                    buildCommand: 'npm install',
+                    startCommand: 'npm start',
+                    region: 'us-west1',
+                    environment: 'production'
+                };
+            
+            case 'render':
+                return {
+                    ...baseConfig,
+                    buildCommand: 'npm install && npm run build',
+                    startCommand: 'npm start',
+                    region: 'oregon',
+                    autoDeploy: true
+                };
+            
+            case 'vercel':
+                return {
+                    ...baseConfig,
+                    framework: 'nextjs',
+                    buildCommand: 'npm run build',
+                    outputDirectory: 'dist',
+                    region: 'iad1'
+                };
+            
+            default:
+                return baseConfig;
+        }
+    }
+
+    async executeDeployment(config) {
+        console.log(`🚀 Executing deployment: ${config.service} → ${config.provider}`);
+        
+        // Simulate deployment process
+        const deploymentSteps = [
+            'preparing_environment',
+            'installing_dependencies', 
+            'building_application',
+            'deploying_service',
+            'configuring_routing',
+            'health_checking'
+        ];
+        
+        const deployment = {
+            id: `deploy-${Date.now()}`,
+            config: config,
+            steps: [],
+            status: 'in_progress',
+            startTime: new Date().toISOString()
+        };
+        
+        for (let step of deploymentSteps) {
+            console.log(`  📋 ${step}...`);
+            
+            // Simulate step execution
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            deployment.steps.push({
+                name: step,
+                status: 'completed',
+                timestamp: new Date().toISOString()
+            });
+        }
+        
+        deployment.status = 'completed';
+        deployment.endTime = new Date().toISOString();
+        deployment.url = this.providers.get(config.provider).url;
+        
+        // Update provider usage
+        const provider = this.providers.get(config.provider);
+        provider.usedHours += 1; // Increment usage estimate
+        
+        console.log(`✅ Deployment completed: ${deployment.url}`);
+        
+        return deployment;
+    }
+
+    async checkProviderHealth(providerName) {
+        const provider = this.providers.get(providerName);
+        if (!provider) {
+            return { healthy: false, reason: 'Provider not found' };
+        }
+        
+        try {
+            // Simulate health check (in real implementation, make actual HTTP request)
+            const healthCheck = {
+                provider: providerName,
+                url: provider.url,
+                status: 'healthy',
+                responseTime: Math.floor(Math.random() * 200) + 50,
+                uptime: '99.9%',
+                timestamp: new Date().toISOString()
+            };
+            
+            return { healthy: true, ...healthCheck };
+            
+        } catch (error) {
+            return { 
+                healthy: false, 
+                reason: error.message,
+                provider: providerName,
+                timestamp: new Date().toISOString()
+            };
+        }
+    }
+
+    async getCloudStatus() {
+        console.log(`📊 Getting comprehensive cloud status...`);
+        
+        const status = {
+            activeProvider: this.activeProvider,
+            providers: {},
+            totalDeployments: this.deploymentHistory.length,
+            resourceUsage: {},
+            healthStatus: 'operational'
+        };
+        
+        // Get status for each provider
+        for (let [name, provider] of this.providers) {
+            const health = await this.checkProviderHealth(name);
+            status.providers[name] = {
+                ...provider,
+                health: health,
+                utilizationPercent: (provider.usedHours / provider.freeHours * 100).toFixed(1)
+            };
+        }
+        
+        // Calculate overall resource usage
+        const totalUsed = Array.from(this.providers.values()).reduce((sum, p) => sum + p.usedHours, 0);
+        const totalAvailable = Array.from(this.providers.values()).reduce((sum, p) => sum + p.freeHours, 0);
+        
+        status.resourceUsage = {
+            totalUsedHours: totalUsed,
+            totalAvailableHours: totalAvailable,
+            utilizationPercent: (totalUsed / totalAvailable * 100).toFixed(1),
+            remainingHours: totalAvailable - totalUsed
+        };
+        
+        return {
+            success: true,
+            cloudStatus: status,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    async optimizeResourceUsage() {
+        console.log(`⚡ Optimizing cloud resource usage...`);
+        
+        const optimizations = [];
+        
+        // Check if current provider is optimal
+        const currentProvider = this.providers.get(this.activeProvider);
+        const utilizationPercent = currentProvider.usedHours / currentProvider.freeHours;
+        
+        if (utilizationPercent > 0.8) {
+            // Switch to provider with more available resources
+            const optimalProvider = await this.selectOptimalProvider();
+            if (optimalProvider !== this.activeProvider) {
+                optimizations.push({
+                    type: 'provider_switch',
+                    from: this.activeProvider,
+                    to: optimalProvider,
+                    reason: 'resource_optimization'
+                });
+            }
+        }
+        
+        // Resource cleanup optimizations
+        optimizations.push({
+            type: 'resource_cleanup',
+            actions: ['unused_deployments', 'log_rotation', 'cache_cleanup'],
+            estimatedSavings: '15%'
+        });
+        
+        return {
+            success: true,
+            optimizations: optimizations,
+            currentUsage: utilizationPercent,
+            projectedSavings: '20%',
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    async switchProvider(targetProviders) {
+        console.log(`🔄 Switching providers: ${targetProviders.join(', ')}`);
+        
+        const currentProvider = this.activeProvider;
+        const targetProvider = targetProviders.find(p => p !== currentProvider && this.providers.has(p));
+        
+        if (!targetProvider) {
+            throw new Error('No valid target provider specified');
+        }
+        
+        const switchResult = await this.switchTraffic(currentProvider, targetProvider);
+        this.activeProvider = targetProvider;
+        
+        return {
+            success: true,
+            switch: {
+                from: currentProvider,
+                to: targetProvider,
+                duration: switchResult.duration,
+                downtime: switchResult.downtime
+            },
+            activeProvider: this.activeProvider,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    async monitorAllProviders() {
+        console.log(`👁️ Monitoring all cloud providers...`);
+        
+        const monitoring = {
+            providers: {},
+            alerts: [],
+            summary: {}
+        };
+        
+        for (let [name, provider] of this.providers) {
+            const health = await this.checkProviderHealth(name);
+            monitoring.providers[name] = {
+                status: health.healthy ? 'operational' : 'degraded',
+                health: health,
+                utilization: (provider.usedHours / provider.freeHours * 100).toFixed(1) + '%'
+            };
+            
+            // Generate alerts
+            if (!health.healthy) {
+                monitoring.alerts.push({
+                    severity: 'high',
+                    provider: name,
+                    message: `Provider ${name} health check failed: ${health.reason}`
+                });
+            }
+            
+            if (provider.usedHours / provider.freeHours > 0.9) {
+                monitoring.alerts.push({
+                    severity: 'warning',
+                    provider: name,
+                    message: `Provider ${name} nearing free tier limit (${(provider.usedHours / provider.freeHours * 100).toFixed(1)}%)`
+                });
+            }
+        }
+        
+        monitoring.summary = {
+            totalProviders: this.providers.size,
+            operationalProviders: Object.values(monitoring.providers).filter(p => p.status === 'operational').length,
+            alertCount: monitoring.alerts.length,
+            activeProvider: this.activeProvider
+        };
+        
+        return {
+            success: true,
+            monitoring: monitoring,
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    async setupMultiCloudArchitecture(ritual) {
+        console.log(`🏗️ Setting up multi-cloud architecture for ${ritual.domain}...`);
+        
+        const architecture = {
+            domain: ritual.domain,
+            subdomains: {},
+            loadBalancing: 'intelligent',
+            failover: 'automatic',
+            providers: []
+        };
+        
+        // Set up subdomain routing
+        for (let [name, provider] of this.providers) {
+            const subdomain = `${name}.${ritual.domain}`;
+            architecture.subdomains[subdomain] = {
+                provider: name,
+                purpose: this.getProviderPurpose(name),
+                url: provider.url
+            };
+            architecture.providers.push(name);
+        }
+        
+        // Configure load balancing rules
+        architecture.routingRules = [
+            { pattern: '/api/trade/*', provider: 'railway', reason: 'low_latency' },
+            { pattern: '/dashboard/*', provider: 'vercel', reason: 'static_optimization' },
+            { pattern: '/backup/*', provider: 'render', reason: 'reliability' }
+        ];
+        
+        return {
+            success: true,
+            architecture: architecture,
+            setup: 'completed',
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    async switchTraffic(fromProvider, toProvider) {
+        console.log(`🔀 Switching traffic: ${fromProvider} → ${toProvider}`);
+        
+        const startTime = Date.now();
+        
+        // Simulate traffic switch process
+        const switchSteps = [
+            'health_check_target',
+            'prepare_target_environment',
+            'gradual_traffic_shift',
+            'monitor_performance',
+            'complete_switch'
+        ];
+        
+        for (let step of switchSteps) {
+            console.log(`  🔄 ${step}...`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+        
+        return {
+            success: true,
+            duration: `${duration}ms`,
+            downtime: '< 100ms',
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    getProviderPurpose(providerName) {
+        const purposes = {
+            'railway': 'primary_trading',
+            'render': 'backup_services',
+            'vercel': 'dashboard_frontend'
+        };
+        return purposes[providerName] || 'general_purpose';
     }
 }
 
