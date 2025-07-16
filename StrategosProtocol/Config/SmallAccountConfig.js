@@ -1,7 +1,9 @@
 /**
  * 🎯 Small Account Trading Configuration
- * Optimized settings for accounts starting with $8.89 USDT
+ * Optimized for maximum diversification and all available pairs.
  */
+
+const tradingPairs = require('./tradingPairs');
 
 class SmallAccountConfig {
     static getConfiguration() {
@@ -9,34 +11,34 @@ class SmallAccountConfig {
             // 💰 Account Settings
             initialBalance: 8.89,
             baseCurrency: 'USDT',
-            minTradeSize: 0.50,        // Coinbase minimum
-            emergencyStopLoss: 0.50,   // Emergency stop threshold
-            
+            minTradeSize: 0.000001,        // Coinbase minimum
+            emergencyStopLoss: 0.50,       // Emergency stop threshold
+
             // 📊 Risk Management
-            maxRiskPerTrade: 0.30,     // 30% max risk per trade (higher for growth)
-            maxDailyLoss: 0.20,        // 20% max daily loss
-            maxOpenPositions: 5,       // Limit concurrent positions
-            
+            maxRiskPerTrade: 0.30,         // 30% max risk per trade
+            maxDailyLoss: 0.20,            // 20% max daily loss
+            maxOpenPositions: tradingPairs.length, // Allow as many positions as pairs
+
             // 🎯 Trading Strategy
-            profitTarget: 0.05,        // 5% profit taking
-            stopLoss: 0.03,           // 3% stop loss
-            rebalanceThreshold: 0.10,  // 10% portfolio imbalance trigger
-            
+            profitTarget: 0.05,            // 5% profit taking
+            stopLoss: 0.03,                // 3% stop loss
+            rebalanceThreshold: 0.10,      // 10% portfolio imbalance trigger
+
             // 🚀 Position Sizing
-            defaultAllocation: 0.20,   // 20% default position size
-            maxSinglePosition: 0.30,   // 30% max single position
-            reserveCash: 0.10,         // Keep 10% cash reserve
-            
+            defaultAllocation: 1 / tradingPairs.length, // Even allocation across all pairs
+            maxSinglePosition: 0.30,       // 30% max single position
+            reserveCash: 0.10,             // Keep 10% cash reserve
+
             // ⏰ Timing Settings
-            tradingCooldown: 300,      // 5 minutes between trades (seconds)
+            tradingCooldown: 300,          // 5 minutes between trades (seconds)
             portfolioReviewInterval: 3600, // 1 hour portfolio review
-            riskCheckInterval: 1800,   // 30 minutes risk assessment
-            
+            riskCheckInterval: 1800,       // 30 minutes risk assessment
+
             // 🎨 UI Display
             showSmallAccountTips: true,
             displayFractionalShares: true,
             highlightLowCostAssets: true,
-            
+
             // 🔔 Notifications
             alertOnProfitTargets: true,
             alertOnStopLoss: true,
@@ -44,52 +46,19 @@ class SmallAccountConfig {
             dailyPerformanceReport: true
         };
     }
-    
+
     /**
-     * Get trading pairs optimized for small accounts
+     * Get trading pairs for maximum diversification (all pairs)
      */
     static getOptimizedTradingPairs() {
-        return [
-            // 🎯 Low Price, High Potential (Best for $8.89 account)
-            {
-                symbol: 'ADA/USDT',
-                allocation: 0.25,
-                priority: 1,
-                reasoning: 'Low price, strong fundamentals, high growth potential'
-            },
-            {
-                symbol: 'MATIC/USDT', 
-                allocation: 0.20,
-                priority: 2,
-                reasoning: 'Layer 2 leader, low price, ecosystem growth'
-            },
-            {
-                symbol: 'ALGO/USDT',
-                allocation: 0.15,
-                priority: 3,
-                reasoning: 'Stable technology, academic backing, low price'
-            },
-            {
-                symbol: 'ATOM/USDT',
-                allocation: 0.15,
-                priority: 4,
-                reasoning: 'Inter-blockchain protocol, growing ecosystem'
-            },
-            {
-                symbol: 'LINK/USDT',
-                allocation: 0.15,
-                priority: 5,
-                reasoning: 'Oracle infrastructure, enterprise adoption'
-            },
-            {
-                symbol: 'UNI/USDT',
-                allocation: 0.10,
-                priority: 6,
-                reasoning: 'DeFi exposure, proven protocol'
-            }
-        ];
+        return tradingPairs.map(symbol => ({
+            symbol,
+            allocation: 1 / tradingPairs.length,
+            priority: 1,
+            reasoning: 'Included for maximum diversification'
+        }));
     }
-    
+
     /**
      * Get progressive trading milestones
      */
@@ -122,23 +91,23 @@ class SmallAccountConfig {
             }
         ];
     }
-    
+
     /**
      * Calculate optimal trade size for current balance
      */
-    static calculateOptimalTradeSize(currentBalance, targetAllocation = 0.20) {
+    static calculateOptimalTradeSize(currentBalance, targetAllocation = 1 / tradingPairs.length) {
         const config = this.getConfiguration();
-        
+
         // Ensure we don't go below minimum trade size
         const idealSize = currentBalance * targetAllocation;
         const adjustedSize = Math.max(idealSize, config.minTradeSize);
-        
+
         // Don't exceed maximum single position
         const maxSize = currentBalance * config.maxSinglePosition;
-        
+
         return Math.min(adjustedSize, maxSize);
     }
-    
+
     /**
      * Get risk-adjusted recommendations
      */
@@ -168,11 +137,9 @@ class SmallAccountConfig {
             return {
                 strategy: 'growth-oriented',
                 maxRisk: 0.35,
-                recommendedPairs: 6,
+                recommendedPairs: tradingPairs.length,
                 message: 'Ready for more aggressive growth strategies'
             };
         }
     }
 }
-
-module.exports = SmallAccountConfig;

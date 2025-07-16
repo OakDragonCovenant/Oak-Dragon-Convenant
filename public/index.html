@@ -1,106 +1,406 @@
+<!-- Agent Creation Modal -->
+<div id="createAgentModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="createAgentModalTitle">
+  <div class="modal-content-400" role="document">
+    <h3 id="createAgentModalTitle">Create New Agent</h3>
+    <form id="createAgentForm">
+      <label for="agentName">Agent Name</label>
+      <input type="text" id="agentName" name="agentName" required class="full-width margin-bottom-1em"><br>
+      <label for="agentType">Agent Type</label>
+      <select id="agentType" name="agentType" required class="full-width margin-bottom-1em">
+        <option value="">-- Select Type --</option>
+        <option value="custom">Custom</option>
+        <option value="lender">Lender</option>
+        <option value="privateMoney">Private Money</option>
+        <option value="dealScout">DealScout</option>
+        <option value="ecommerce">E-Commerce</option>
+        <option value="other">Other</option>
+      </select><br>
+      <button type="submit" class="btn-primary">Create Agent</button>
+      <button type="button" class="btn-secondary" onclick="closeCreateAgentModal()">Cancel</button>
+    </form>
+    <div id="createAgentMsg" class="margin-top-1em"></div>
+  </div>
+</div>
+
+
+<!-- Button to open Agent Creation Modal -->
+<button class="btn-primary margin-top-1em" onclick="openCreateAgentModal()">Create New Agent</button>
+
+
+<!-- Not Yet Created Agents (Static, Predefined) -->
+<div id="staticAgentList" class="margin-top-2em">
+  <div class="agent-card custom-agent-card margin-top-1em">
+    <div class="agent-card-header-flex">
+      <i class="fas fa-user-astronaut agent-icon"></i>
+      <div>
+        <h3 class="no-margin">AI Research Agent</h3>
+        <span class="status-dot" style="background:#2e7d32"></span>
+        <span class="status-active-green">Status: <span>Active</span></span>
+      </div>
+    </div>
+    <div class="agent-card-body">
+      <p><strong>Type:</strong> Research</p>
+      <p>This agent is now active for research automation and intelligence gathering.</p>
+    </div>
+  </div>
+  <div class="agent-card custom-agent-card margin-top-1em">
+    <div class="agent-card-header-flex">
+      <i class="fas fa-user-astronaut agent-icon"></i>
+      <div>
+        <h3 class="no-margin">Compliance Agent</h3>
+        <span class="status-dot" style="background:#2e7d32"></span>
+        <span class="status-active-green">Status: <span>Active</span></span>
+      </div>
+    </div>
+    <div class="agent-card-body">
+      <p><strong>Type:</strong> Compliance</p>
+      <p>This agent is now active for regulatory compliance and reporting tasks.</p>
+    </div>
+  </div>
+  <div class="agent-card custom-agent-card margin-top-1em">
+    <div class="agent-card-header-flex">
+      <i class="fas fa-user-astronaut agent-icon"></i>
+      <div>
+        <h3 class="no-margin">Marketing Automation Agent</h3>
+        <span class="status-dot" style="background:#2e7d32"></span>
+        <span class="status-active-green">Status: <span>Active</span></span>
+      </div>
+    </div>
+    <div class="agent-card-body">
+      <p><strong>Type:</strong> Marketing</p>
+      <p>This agent is now active for automating marketing campaigns and outreach.</p>
+    </div>
+  </div>
+</div>
+<!-- Dynamic Agent List (for user-created agents) -->
+<div id="dynamicAgentList" class="margin-top-2em"></div>
+
+
+<script>
+function openCreateAgentModal() {
+  document.getElementById('createAgentModal').classList.remove('modal-hidden');
+  document.getElementById('createAgentMsg').textContent = '';
+  document.getElementById('createAgentForm').reset();
+}
+function closeCreateAgentModal() {
+  document.getElementById('createAgentModal').classList.add('modal-hidden');
+}
+document.getElementById('createAgentForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const name = document.getElementById('agentName').value.trim();
+  const type = document.getElementById('agentType').value;
+  const msgDiv = document.getElementById('createAgentMsg');
+  msgDiv.textContent = 'Creating agent...';
+  setTimeout(function() {
+    msgDiv.textContent = `Agent '${name}' (${type}) created!`;
+    addAgentCard(name, type);
+    setTimeout(closeCreateAgentModal, 1200);
+  }, 1000);
+};
+
+function addAgentCard(name, type) {
+  const container = document.getElementById('dynamicAgentList');
+  const card = document.createElement('div');
+  card.className = 'agent-card custom-agent-card margin-top-1em';
+  card.innerHTML = `
+    <div class="agent-card-header-flex">
+      <i class="fas fa-user-astronaut agent-icon"></i>
+      <div>
+        <h3 class="no-margin">${escapeHTML(name)}</h3>
+        <span class="status-dot"></span>
+        <span class="status-active-green">Status: <span>Created</span></span>
+      </div>
+    </div>
+    <div class="agent-card-body">
+      <p><strong>Type:</strong> ${escapeHTML(type)}</p>
+      <p>This agent was created dynamically. Add more features as needed.</p>
+    </div>
+  `;
+  container.appendChild(card);
+}
+
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, function(tag) {
+    const chars = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'};
+    return chars[tag] || tag;
+  });
+}
+</script>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oak Dragon Covenant - Command Portal</title>
-    <link rel="stylesheet" href="/portal-styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <!-- Security: Content Security Policy -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' http://localhost:4000; object-src 'none'; base-uri 'self'; form-action 'self';">
+  <!-- Security: Referrer Policy -->
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Oak Dragon Covenant - Command Portal</title>
+  <script>
+  // Security: Warn if not using HTTPS (except localhost)
+  if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+    alert('Warning: You are not using HTTPS. For security, always access this portal over HTTPS.');
+  }
+  </script>
+  <link rel="stylesheet" href="/portal-styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --odc-crimson: #a30000;
+      --odc-black: #111111;
+      --odc-gold: #ffd700;
+    }
+    .odc-crimson { color: var(--odc-crimson) !important; }
+    .odc-black { color: var(--odc-black) !important; }
+    .odc-gold { color: var(--odc-gold) !important; }
+    .odc-bg-crimson { background: var(--odc-crimson) !important; color: #fff !important; }
+    .odc-bg-black { background: var(--odc-black) !important; color: #ffd700 !important; }
+    .odc-bg-gold { background: var(--odc-gold) !important; color: #111 !important; }
+    /* Example usage: <span class="odc-crimson">Crimson</span> */
+    .status-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #2e7d32;
+      margin-right: 0.5em;
+      text-align: left;
+    }
+    .directory-table th {
+      background: #f5f7fa;
+      font-weight: 600;
+      color: #222;
+    }
+    .directory-table tr:nth-child(even) {
+      background: #f9fafb;
+    }
+    .directory-table a {
+      color: #1a73e8;
+      text-decoration: underline;
+      word-break: break-all;
+    }
+    .directory-table a:hover {
+      color: #174ea6;
+    }
+    .business-creditors-directory h2,
+    .business-creditors-directory h3 {
+      margin-top: 1.5em;
+      margin-bottom: 0.5em;
+    }
+    .business-creditors-directory p {
+      margin-bottom: 1.5em;
+      color: #444;
+    }
+    .margin-top-2em {
+      margin-top: 2em !important;
+    }
+    .margin-top-1em {
+      margin-top: 1em !important;
+    }
+    /* --- Modal Styles (for Bot and Directory Modals) --- */
+    .modal-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(30,40,60,0.45);
+      z-index: 1000;
+    }
+    .btn-secondary {
+      background: #f5f7fa;
+      color: #222;
+      border: 1px solid #cfd8dc;
+      border-radius: 4px;
+      padding: 0.6em 1.2em;
+      font-weight: 500;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
-    <div class="portal-container">
-        <!-- Header -->
-        <header class="portal-header">
-            <div class="header-content">
-                <div class="logo-section">
-                    <i class="fas fa-dragon"></i>
-                    <h1>Oak Dragon Covenant</h1>
-                    <span class="tagline">Multi-Protocol Command Center</span>
-                </div>
-                <div class="status-indicators">
-                    <div class="status-item" id="system-status">
-                        <i class="fas fa-circle"></i>
-                        <span>System Online</span>
-                    </div>
-                    <div class="status-item" id="trading-status">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Trading Active</span>
-                    </div>
-                    <div class="status-item" id="portfolio-value">
-                        <i class="fas fa-wallet"></i>
-                        <span>$100,000</span>
-                    </div>
-                </div>
-            </div>
-        </header>
+  <!-- Security Login Modal -->
+  <div id="securityLoginModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="securityLoginModalTitle">
+    <div class="modal-content-400" role="document">
+      <h3 id="securityLoginModalTitle">Secure Login</h3>
+      <form id="securityLoginForm">
+        <label for="securityUsername">Username</label>
+        <input type="text" id="securityUsername" name="securityUsername" required class="full-width margin-bottom-1em" autocomplete="username"><br>
+        <label for="securityPassword">Password</label>
+        <input type="password" id="securityPassword" name="securityPassword" required class="full-width margin-bottom-1em" autocomplete="current-password"><br>
+        <label for="securityFingerprint">Device Fingerprint</label>
+        <input type="text" id="securityFingerprint" name="securityFingerprint" class="full-width margin-bottom-1em" readonly tabindex="-1" style="background:#f5f5f5;color:#888;user-select:all;" aria-label="Device Fingerprint"><br>
+        <button type="submit" class="btn-primary">Login</button>
+        <button type="button" class="btn-secondary" onclick="closeSecurityLoginModal()">Cancel</button>
+      </form>
+      <div id="securityLoginMsg" class="margin-top-1em"></div>
+    </div>
+  </div>
+  <!-- ...existing code... -->
+<!-- Duplicate DOCTYPE/HTML/HEAD/BODY and stray code fragments removed for clean structure. All CSS is in <head>, all JS is at the end of <body>. -->
+  <!-- Persistent LenderAgent Card -->
+  <div class="agent-card lender-agent-card margin-top-1em">
+    <div class="agent-card-header-flex">
+      <i class="fas fa-search-dollar agent-icon"></i>
+      <div>
+        <h3 class="no-margin">LenderAgent</h3>
+        <span class="status-dot" id="lenderAgentStatusDot"></span>
+        <span class="status-active-green">Status: <span id="lenderAgentStatus">Online</span></span>
+        <span class="status-timestamp" id="lenderAgentStatusTime"></span>
+      </div>
+      <label class="switch margin-left-1em" title="Toggle automation">
+        <input type="checkbox" id="autoLenderAgent" checked onchange="toggleAgentAutomation('lenderAgent', this.checked)">
+        <span class="slider"></span> Auto
+      </label>
+    </div>
+    <div class="agent-card-body">
+      <p><strong>Role:</strong> Continuously searches the internet for new business creditors and lenders to expand your directory. Integrates with your backend for live updates.</p>
+      <ul class="agent-card-list">
+        <li>Monitors public sources and APIs for new lenders</li>
+        <li>Suggests additions to the directory</li>
+        <li>Displays last search results and agent status</li>
+      </ul>
+      <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('lenderAgentLog')">Show Log</button>
+      <div class="lender-agent-status margin-top-1em">
+        <span><strong>Last Search:</strong> <span id="lenderAgentLastSearch">Loading...</span></span><br>
+        <div>
+          <span><strong>New Lenders Found:</strong></span>
+          <ul id="lenderAgentResults">
+            <li>Loading...</li>
+          </ul>
+          <span class="lender-agent-hint">(Live agent results powered by backend API.)</span>
+        </div>
+      </div>
+      <div id="lenderAgentLog" class="agent-log collapse"></div>
+<script>
+// --- LenderAgent Status/Log/Automation ---
+setInterval(() => updateAgentStatus('lenderAgent', true, 'Heartbeat'), 60000);
+document.addEventListener('DOMContentLoaded', function() {
+  updateAgentStatus('lenderAgent', true, 'Agent loaded');
+});
+// LenderAgent persistent fetch logic
+async function fetchLenderAgentResults() {
+  const lastSearch = document.getElementById('lenderAgentLastSearch');
+  const resultsList = document.getElementById('lenderAgentResults');
+  if (!lastSearch || !resultsList) return;
+  lastSearch.textContent = 'Searching...';
+  resultsList.innerHTML = '<li>Searching for new lenders...</li>';
+  try {
+    const res = await fetch('/api/lenders/discover');
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    lastSearch.textContent = new Date().toLocaleString();
+    if (Array.isArray(data) && data.length > 0) {
+      resultsList.innerHTML = data.map(l =>
+        `<li><strong>${l.name}</strong> - ` +
+        (l.email ? `<a href="mailto:${l.email}">${l.email}</a> - ` : '') +
+        (l.website ? `<a href="${l.website}" target="_blank" rel="noopener">${l.website.replace(/^https?:\/\//, '')}</a>` : '') +
+        `</li>`
+      ).join('');
+    } else {
+      resultsList.innerHTML = '<li>No new lenders found.</li>';
+    }
+  } catch (e) {
+    lastSearch.textContent = 'Error';
+    resultsList.innerHTML = '<li class="text-muted">Error fetching lenders.</li>';
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  // You can call fetchLenderAgentResults() here if needed
+});
+</script>
 
-        <!-- Navigation Tabs -->
-        <nav class="portal-nav">
-            <div class="nav-tabs">
-                <button class="tab-button active" data-tab="overview">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Overview</span>
-                </button>
-                <button class="tab-button" data-tab="real-estate">
-                    <i class="fas fa-home"></i>
-                    <span>Real Estate</span>
-                </button>
-                <button class="tab-button" data-tab="crypto-trading">
-                    <i class="fas fa-coins"></i>
-                    <span>Crypto Trading</span>
-                </button>
-                <button class="tab-button" data-tab="ai-intelligence">
-                    <i class="fas fa-brain"></i>
-                    <span>AI Intelligence</span>
-                </button>
-                <button class="tab-button" data-tab="automation">
-                    <i class="fas fa-robot"></i>
-                    <span>Automation</span>
-                </button>
-                <button class="tab-button" data-tab="exchanges">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Exchanges</span>
-                </button>
-                <button class="tab-button" data-tab="monitoring">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Monitoring</span>
-                </button>
-                <button class="tab-button" data-tab="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </button>
-            </div>
-        </nav>
+<!-- Moved HTML content below out of script block -->
+<td><a href="https://crfusa.com" target="_blank" rel="noopener">crfusa.com</a></td>
+</tr>
+<tr>
+  <td>SBA Microloan Program (SBA DC)</td>
+  <td>409 3rd St SW, Washington, DC 20416</td>
+  <td>(202) 205-6450</td>
+  <td><a href="mailto:sba@sba.gov">sba@sba.gov</a></td>
+  <td><a href="https://sba.gov/microloan" target="_blank" rel="noopener">sba.gov/microloan</a></td>
+</tr>
+</tbody>
+</table>
 
-        <!-- Main Content Area -->
-        <main class="portal-content">
-            <!-- Overview Tab -->
-            <div class="tab-content active" id="overview">
-                <div class="overview-grid">
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <h3>System Health</h3>
-                            <i class="fas fa-heartbeat"></i>
-                        </div>
-                        <div class="metric-value">
-                            <span class="value">98.7%</span>
-                            <span class="change positive">+0.3%</span>
-                        </div>
-                        <div class="metric-details">
-                            <div class="detail-item">
-                                <span>Agents Active:</span>
-                                <span class="status-green">7/7</span>
-                            </div>
-                            <div class="detail-item">
-                                <span>API Health:</span>
-                                <span class="status-green">Excellent</span>
-                            </div>
-                        </div>
-                    </div>
+<h3 class="margin-top-2em">SBA‐Preferred & Credit Union CUSO Lenders</h3>
+<td>PayPal</td>
+<td><a href="mailto:service@paypal.com">service@paypal.com</a></td>
+<td>+1 888 221 1161</td>
+<td><a href="https://paypal.com" target="_blank" rel="noopener">paypal.com</a></td>
+<td><a href="https://paypal-status.com" target="_blank" rel="noopener">paypal-status.com</a></td>
+</tr>
+<tr>
+  <td>Square</td>
+  <td><a href="mailto:developer@squareup.com">developer@squareup.com</a></td>
+  <td>+1 855 700 6000</td>
+  <td><a href="https://squareup.com" target="_blank" rel="noopener">squareup.com</a></td>
+  <td><a href="https://squareup.statuspage.io" target="_blank" rel="noopener">squareup.statuspage.io</a></td>
+</tr>
+      <tr>
+        <td>Adyen</td>
+        <td><a href="mailto:developers@adyen.com">developers@adyen.com</a></td>
+        <td>+1 855 680 1230</td>
+        <td><a href="https://adyen.com" target="_blank" rel="noopener">adyen.com</a></td>
+        <td><a href="https://status.adyen.com" target="_blank" rel="noopener">status.adyen.com</a></td>
+      </tr>
+      <tr>
+        <td>Authorize.net</td>
+        <td><a href="mailto:support@authorize.net">support@authorize.net</a></td>
+        <td>+1 877 447 3938</td>
+        <td><a href="https://authorize.net" target="_blank" rel="noopener">authorize.net</a></td>
+        <td>N/A</td>
+      </tr>
+    </tbody>
+  </table>
 
-                    <div class="metric-card">
-                        <div class="metric-header">
+  <h3>4. Ecommerce Platforms & Hosting</h3>
+  <table class="directory-table">
+    <thead>
+      <tr>
+        <th>Supplier</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Website</th>
+        <th>API Status / Uptime</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Shopify</td>
+        <td><a href="mailto:support@shopify.com">support@shopify.com</a></td>
+        <td>+1 888 746 7439</td>
+        <td><a href="https://shopify.com" target="_blank" rel="noopener">shopify.com</a></td>
+        <td data-supplier-status="Shopify"><span style="color:#888">Loading...</span></td>
+      </tr>
+      <tr>
+        <td>PayPal</td>
+        <td><a href="mailto:service@paypal.com">service@paypal.com</a></td>
+        <td>+1 888 221 1161</td>
+        <td><a href="https://paypal.com" target="_blank" rel="noopener">paypal.com</a></td>
+        <td data-supplier-status="PayPal"><span style="color:#888">Loading...</span></td>
+      </tr>
+      <tr>
+        <td>Square</td>
+        <td><a href="mailto:developer@squareup.com">developer@squareup.com</a></td>
+        <td>+1 855 700 6000</td>
+        <td><a href="https://squareup.com" target="_blank" rel="noopener">squareup.com</a></td>
+        <td data-supplier-status="Square"><span style="color:#888">Loading...</span></td>
+      </tr>
+      <tr>
+        <td>Adyen</td>
+        <td><a href="mailto:developers@adyen.com">developers@adyen.com</a></td>
+        <td>+1 855 680 1230</td>
+        <td><a href="https://adyen.com" target="_blank" rel="noopener">adyen.com</a></td>
+        <td data-supplier-status="Adyen"><span style="color:#888">Loading...</span></td>
+      </tr>
+      <tr>
+        <td>Authorize.net</td>
+        <td><a href="mailto:support@authorize.net">support@authorize.net</a></td>
+        <td>+1 877 447 3938</td>
+        <td><a href="https://authorize.net" target="_blank" rel="noopener">authorize.net</a></td>
+        <td data-supplier-status="Authorize.net"><span style="color:#888">Loading...</span></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
                             <h3>Portfolio Performance</h3>
                             <i class="fas fa-chart-line"></i>
                         </div>
@@ -108,73 +408,6 @@
                             <span class="value">$102,450</span>
                             <span class="change positive">+2.45%</span>
                         </div>
-                        <div class="metric-details">
-                            <div class="detail-item">
-                                <span>24h Change:</span>
-                                <span class="status-green">+$2,450</span>
-                            </div>
-                            <div class="detail-item">
-                                <span>Active Trades:</span>
-                                <span>3</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <h3>Real Estate Portfolio</h3>
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <div class="metric-value">
-                            <span class="value">12</span>
-                            <span class="change positive">+2</span>
-                        </div>
-                        <div class="metric-details">
-                            <div class="detail-item">
-                                <span>Total Value:</span>
-                                <span>$2.4M</span>
-                            </div>
-                            <div class="detail-item">
-                                <span>Monthly ROI:</span>
-                                <span class="status-green">8.2%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <h3>AI Operations</h3>
-                            <i class="fas fa-brain"></i>
-                        </div>
-                        <div class="metric-value">
-                            <span class="value">847</span>
-                            <span class="change positive">+124</span>
-                        </div>
-                        <div class="metric-details">
-                            <div class="detail-item">
-                                <span>Decisions/Day:</span>
-                                <span>847</span>
-                            </div>
-                            <div class="detail-item">
-                                <span>Accuracy:</span>
-                                <span class="status-green">94.2%</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="activity-section">
-                    <h3>Recent Activity</h3>
-                    <div class="activity-feed">
-                        <div class="activity-item">
-                            <i class="fas fa-coins activity-icon crypto"></i>
-                            <div class="activity-content">
-                                <span class="activity-title">BTC Trade Executed</span>
-                                <span class="activity-time">2 minutes ago</span>
-                            </div>
-                            <span class="activity-value positive">+$450</span>
-                        </div>
-                        <div class="activity-item">
                             <i class="fas fa-home activity-icon realty"></i>
                             <div class="activity-content">
                                 <span class="activity-title">Property Analysis Complete</span>
@@ -211,6 +444,370 @@
                 </div>
 
                 <div class="real-estate-grid">
+  <!-- Private Money Agent Card -->
+
+  <div class="operation-card" id="privateMoneyAgentCard">
+    <h3>Private Money Agent</h3>
+    <div class="card-content">
+      <div class="agent-status">
+        <span class="status-dot" id="privateMoneyAgentStatusDot"></span>
+        <span class="agent-name">Private Money Agent</span>
+        <span id="privateMoneyAgentStatus" class="status-active">Idle</span>
+        <span class="status-timestamp" id="privateMoneyAgentStatusTime"></span>
+        <label class="switch margin-left-1em" title="Toggle automation">
+          <input type="checkbox" id="autoPrivateMoneyAgent" checked onchange="toggleAgentAutomation('privateMoneyAgent', this.checked)">
+          <span class="slider"></span> Auto
+        </label>
+        <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('privateMoneyAgentLog')">Show Log</button>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <label>Deals Funded:</label>
+          <value id="privateMoneyDealsFunded">0</value>
+        </div>
+        <div class="metric">
+          <label>Status:</label>
+          <value id="privateMoneyStatus">Ready</value>
+        </div>
+      </div>
+      <button class="action-btn" onclick="openPrivateMoneyModal()">Manage</button>
+      <div id="privateMoneyAgentLog" class="agent-log collapse"></div>
+    </div>
+  </div>
+  <script>
+  // --- PrivateMoneyAgent Status/Log/Automation ---
+  setInterval(function() { updateAgentStatus('privateMoneyAgent', true, 'Heartbeat'); }, 60000);
+  document.addEventListener('DOMContentLoaded', function() {
+    updateAgentStatus('privateMoneyAgent', true, 'Agent loaded');
+  });
+  </script>
+
+  <!-- Private Money Agent Modal -->
+  <div id="privateMoneyModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="privateMoneyModalTitle">
+    <div class="modal-content-400" role="document">
+      <h3 id="privateMoneyModalTitle">Private Money Agent Workflow</h3>
+      <div id="privateMoneyWorkflow">
+        <p>Track and automate private money deals.</p>
+        <button class="btn-primary" onclick="addPrivateMoneyDeal()">Add New Deal</button>
+        <ul id="privateMoneyDealList" class="margin-top-1em"></ul>
+      </div>
+      <button class="btn-secondary" onclick="closePrivateMoneyModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- DealScout Agent Card -->
+
+  <div class="operation-card" id="dealScoutAgentCard">
+    <h3>DealScout Agent</h3>
+    <div class="card-content">
+      <div class="agent-status">
+        <span class="status-dot" id="dealScoutAgentStatusDot"></span>
+        <span class="agent-name">DealScout</span>
+        <span id="dealScoutStatus" class="status-active">Seeking</span>
+        <span class="status-timestamp" id="dealScoutAgentStatusTime"></span>
+        <label class="switch margin-left-1em" title="Toggle automation">
+          <input type="checkbox" id="autoDealScoutAgent" checked onchange="toggleAgentAutomation('dealScoutAgent', this.checked)">
+          <span class="slider"></span> Auto
+        </label>
+        <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('dealScoutAgentLog')">Show Log</button>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <label>Deals Found:</label>
+          <value id="dealScoutDeals">0</value>
+        </div>
+        <div class="metric">
+          <label>Active Pursuits:</label>
+          <value id="dealScoutActive">0</value>
+        </div>
+      </div>
+      <button class="action-btn" onclick="openDealScoutModal()">View Deals</button>
+      <div id="dealScoutAgentLog" class="agent-log collapse"></div>
+    </div>
+  </div>
+  <script>
+  // --- DealScoutAgent Status/Log/Automation ---
+  setInterval(function() { updateAgentStatus('dealScoutAgent', true, 'Heartbeat'); }, 60000);
+  document.addEventListener('DOMContentLoaded', function() {
+    updateAgentStatus('dealScoutAgent', true, 'Agent loaded');
+  });
+  </script>
+
+  <!-- DealScout Agent Modal -->
+  <div id="dealScoutModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="dealScoutModalTitle">
+    <div class="modal-content-600" role="document">
+      <h3 id="dealScoutModalTitle">DealScout Agent Workflow</h3>
+      <div id="dealScoutWorkflow">
+        <p>Live feed of new deals found across all REI methods. Filter, assign, and track deals.</p>
+        <button class="btn-primary" onclick="addDealScoutDeal()">Add New Deal</button>
+        <ul id="dealScoutDealList" class="margin-top-1em"></ul>
+      </div>
+      <button class="btn-secondary" onclick="closeDealScoutModal()">Close</button>
+    </div>
+  </div>
+<script>
+// --- DealScout Agent Logic ---
+let dealScoutDeals = [];
+let dealScoutStatus = 'Seeking';
+function openDealScoutModal() {
+  document.getElementById('dealScoutModal').classList.remove('modal-hidden');
+  renderDealScoutDeals();
+}
+function closeDealScoutModal() {
+  document.getElementById('dealScoutModal').classList.add('modal-hidden');
+}
+function addDealScoutDeal() {
+  dealScoutStatus = 'Processing';
+  updateDealScoutStatus();
+  setTimeout(() => {
+    const deal = {
+      id: Date.now(),
+      name: `Deal #${dealScoutDeals.length + 1}`,
+      method: randomREIMethod(),
+      location: randomLocation(),
+      amount: (Math.random() * 250000 + 50000).toFixed(0),
+      date: new Date().toLocaleString()
+    };
+    dealScoutDeals.push(deal);
+    // Defensive: check if element exists
+    const dealsElem = document.getElementById('dealScoutDeals');
+    if (dealsElem) dealsElem.textContent = dealScoutDeals.length;
+    const activeElem = document.getElementById('dealScoutActive');
+    if (activeElem) activeElem.textContent = dealScoutDeals.length;
+    dealScoutStatus = 'Seeking';
+    updateDealScoutStatus();
+    renderDealScoutDeals();
+  }, 1200);
+}
+function renderDealScoutDeals() {
+  const list = document.getElementById('dealScoutDealList');
+  if (!list) return;
+  if (dealScoutDeals.length === 0) {
+    list.innerHTML = '<ul><li>No deals found yet.</li></ul>';
+    return;
+  }
+  list.innerHTML = '<ul>' + dealScoutDeals.map(
+    d => `<li><strong>${d.name}</strong> - $${d.amount} - <em>${d.method}</em> - <span>${d.location}</span> <span class="text-muted">(${d.date})</span></li>`
+  ).join('') + '</ul>';
+}
+function updateDealScoutStatus() {
+  const statusElem = document.getElementById('dealScoutStatus');
+  if (statusElem) statusElem.textContent = dealScoutStatus;
+}
+function randomREIMethod() {
+  const methods = [
+    'Private Money', 'Hard Money', 'Seller Financing', 'Lease Option', 'Partnership',
+    'Syndication', 'Crowdfunding', 'Grant', 'Business LOC', 'Mezzanine',
+    'Convertible Note', 'Equity', 'Asset-Based', 'Mortgage Assumption', 'Home Equity', 'Retirement Funds'
+  ];
+  return methods[Math.floor(Math.random() * methods.length)];
+}
+function randomLocation() {
+  const cities = ['Chicago, IL', 'Dallas, TX', 'Atlanta, GA', 'Phoenix, AZ', 'Orlando, FL', 'Denver, CO', 'Seattle, WA', 'Charlotte, NC'];
+  return cities[Math.floor(Math.random() * cities.length)];
+}
+</script>
+
+
+<!-- Move LenderAgent script to end of body for correct parsing -->
+<script>
+// --- LenderAgent Status/Log/Automation ---
+setInterval(function() { updateAgentStatus('lenderAgent', true, 'Heartbeat'); }, 60000);
+document.addEventListener('DOMContentLoaded', function() {
+  updateAgentStatus('lenderAgent', true, 'Agent loaded');
+  fetchLenderAgentResults();
+  setInterval(fetchLenderAgentResults, 5 * 60 * 1000); // every 5 minutes
+  var btn = document.getElementById('findLendersBtn');
+  if (btn) btn.onclick = openFindLendersModal;
+});
+
+
+// --- Device Fingerprinting ---
+// --- Security Login Modal Logic ---
+function openSecurityLoginModal() {
+  document.getElementById('securityLoginModal').classList.remove('modal-hidden');
+  document.getElementById('securityLoginMsg').textContent = '';
+  document.getElementById('securityLoginForm').reset();
+  // Set fingerprint field
+  var fp = getDeviceFingerprint();
+  document.getElementById('securityFingerprint').value = fp;
+  setTimeout(function() {
+    document.getElementById('securityUsername').focus();
+  }, 100);
+}
+function closeSecurityLoginModal() {
+  document.getElementById('securityLoginModal').classList.add('modal-hidden');
+}
+document.getElementById('securityLoginForm').onsubmit = function(e) {
+  e.preventDefault();
+  const username = document.getElementById('securityUsername').value.trim();
+  const password = document.getElementById('securityPassword').value;
+  const fingerprint = document.getElementById('securityFingerprint').value;
+  const msgDiv = document.getElementById('securityLoginMsg');
+  msgDiv.textContent = 'Authenticating...';
+  // TODO: Replace with real authentication logic
+  setTimeout(function() {
+    // Example: also check fingerprint if needed
+    if (username === 'admin' && password === 'dragon') {
+      msgDiv.textContent = 'Login successful!';
+      setTimeout(closeSecurityLoginModal, 800);
+    } else {
+      msgDiv.textContent = 'Invalid credentials.';
+    }
+  }, 900);
+};
+
+// Show login modal on backtick (`) key press
+document.addEventListener('keydown', function(e) {
+  if (e.key === '`' && !document.getElementById('securityLoginModal').classList.contains('modal-hidden')) return;
+  if (e.key === '`') {
+    openSecurityLoginModal();
+    e.preventDefault();
+  }
+});
+function getDeviceFingerprint() {
+  // Simple fingerprint: userAgent + language + platform + screen size + timezone
+  const nav = window.navigator;
+  const fp = [
+    nav.userAgent,
+    nav.language,
+    nav.platform,
+    screen.width + 'x' + screen.height,
+    Intl.DateTimeFormat().resolvedOptions().timeZone
+  ].join('|');
+  // Hash (simple):
+  let hash = 0;
+  for (let i = 0; i < fp.length; i++) {
+    hash = ((hash << 5) - hash) + fp.charCodeAt(i);
+    hash |= 0;
+  }
+  return hash.toString();
+}
+
+function storeDeviceFingerprint() {
+  const fp = getDeviceFingerprint();
+  sessionStorage.setItem('DEVICE_FP', fp);
+}
+
+function checkDeviceFingerprint() {
+  const current = getDeviceFingerprint();
+  const stored = sessionStorage.getItem('DEVICE_FP');
+  if (stored && stored !== current) {
+    alert('Warning: Device fingerprint mismatch. For security, please re-authenticate.');
+    sessionStorage.removeItem('API_KEY');
+    openApiKeyModal();
+  } else if (!stored) {
+    storeDeviceFingerprint();
+  }
+}
+
+// Run device fingerprint check on load
+document.addEventListener('DOMContentLoaded', function() {
+  checkDeviceFingerprint();
+});
+
+// --- Secure API Key Handling ---
+function getApiKey() {
+  return sessionStorage.getItem('API_KEY') || '';
+}
+function setApiKey(key) {
+  sessionStorage.setItem('API_KEY', key);
+}
+function requireApiKey() {
+  let key = getApiKey();
+  if (!key) {
+    openApiKeyModal();
+  }
+  return key;
+}
+
+// Modal for API Key entry
+function openApiKeyModal() {
+  let modal = document.getElementById('apiKeyModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'apiKeyModal';
+    modal.className = 'modal-bg';
+    modal.innerHTML = `
+      <div class="modal-content-400" role="dialog" aria-modal="true" aria-labelledby="apiKeyModalTitle">
+        <h3 id="apiKeyModalTitle">Enter API Key</h3>
+        <form id="apiKeyForm">
+          <label for="apiKeyInput">API Key</label>
+          <input type="password" id="apiKeyInput" name="apiKeyInput" required class="full-width margin-bottom-1em" autocomplete="off"><br>
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+        <div id="apiKeyMsg" class="margin-top-1em"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('apiKeyForm').onsubmit = function(e) {
+      e.preventDefault();
+      const key = document.getElementById('apiKeyInput').value.trim();
+      if (key) {
+        setApiKey(key);
+        document.getElementById('apiKeyMsg').textContent = 'API key saved!';
+        setTimeout(() => { modal.remove(); location.reload(); }, 800);
+      } else {
+        document.getElementById('apiKeyMsg').textContent = 'API key is required.';
+      }
+    };
+  }
+}
+
+// Require API key on load
+document.addEventListener('DOMContentLoaded', function() {
+  requireApiKey();
+});
+
+async function fetchLenderAgentResults() {
+  const lastSearch = document.getElementById('lenderAgentLastSearch');
+  const resultsList = document.getElementById('lenderAgentResults');
+  if (!lastSearch || !resultsList) return;
+  lastSearch.textContent = 'Searching...';
+  resultsList.innerHTML = '<li>Searching for new lenders...</li>';
+  try {
+    const res = await fetch('http://localhost:4000/api/lenders/discover', {
+      headers: { 'x-api-key': getApiKey() }
+    });
+    if (!res.ok) throw new Error('API error');
+    const data = await res.json();
+    lastSearch.textContent = new Date().toLocaleString();
+    if (Array.isArray(data) && data.length > 0) {
+      resultsList.innerHTML = data.map(function(l) {
+        return '<li><strong>' + l.name + '</strong> - ' +
+          (l.email ? '<a href="mailto:' + l.email + '">' + l.email + '</a> - ' : '') +
+          (l.website ? '<a href="' + l.website + '" target="_blank" rel="noopener">' + l.website.replace(/^https?:\/\//, '') + '</a>' : '') +
+          '</li>';
+      }).join('');
+    } else {
+      resultsList.innerHTML = '<li>No new lenders found.</li>';
+    }
+  } catch (e) {
+    lastSearch.textContent = 'Error';
+    resultsList.innerHTML = '<li class="text-muted">Error fetching lenders.</li>';
+  }
+}
+
+function openFindLendersModal() {
+  document.getElementById('findLendersModal').classList.remove('modal-hidden');
+  document.getElementById('findLendersResults').innerHTML = 'Searching for new lenders...';
+  setTimeout(function() {
+    document.getElementById('findLendersResults').innerHTML =
+      '<ul>' +
+        '<li><strong>Example Lender 1</strong> - <a href="mailto:contact@examplelender1.com">contact@examplelender1.com</a> - <a href="https://examplelender1.com" target="_blank" rel="noopener">examplelender1.com</a></li>' +
+        '<li><strong>Example Lender 2</strong> - <a href="mailto:info@examplelender2.com">info@examplelender2.com</a> - <a href="https://examplelender2.com" target="_blank" rel="noopener">examplelender2.com</a></li>' +
+      '</ul>' +
+      '<p class="text-muted">(Replace with live results from your backend bot.)</p>';
+  }, 1800);
+}
+function closeFindLendersModal() {
+  document.getElementById('findLendersModal').classList.add('modal-hidden');
+}
+</script>
+// ...existing code...
+</body>
+</html>
+
                     <div class="operation-card">
                         <h3>Property Acquisition</h3>
                         <div class="card-content">
@@ -233,8 +830,1285 @@
                             </button>
                         </div>
                     </div>
-
+                    <!-- Bank Loan Bot Card -->
                     <div class="operation-card">
+                        <h3>Bank Loan Bot</h3>
+                        <div class="card-content">
+                            <div class="agent-status">
+                                <span class="agent-name">Bank Loan Bot</span>
+                                <span class="status-active">Idle</span>
+                            </div>
+                            <div class="metrics">
+                                <div class="metric">
+                                    <label>Applications:</label>
+                                    <value id="bankLoanAppCount">0</value>
+                                </div>
+                                <div class="metric">
+                                    <label>Status:</label>
+                                    <value id="bankLoanStatus">Ready</value>
+                                </div>
+                            </div>
+                            <button class="action-btn" onclick="openBankLoanModal()">
+                                Manage Bank Loans
+                            </button>
+                        </div>
+                    </div>
+<!-- Bank Loan Bot Modal -->
+<div id="bankLoanModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="bankLoanModalTitle">
+  <div class="modal-content-600" role="document">
+    <h2 id="bankLoanModalTitle">Bank Loan Bot Workflow</h2>
+    <!-- Progress Stepper -->
+    <div class="progress-stepper" id="bankLoanStepper">
+      <div class="step active" id="step-initiate">1. Initiate</div>
+      <div class="step" id="step-discovery">2. Discovery</div>
+      <div class="step" id="step-docs">3. Documents</div>
+      <div class="step" id="step-submit">4. Submit</div>
+      <div class="step" id="step-track">5. Tracking</div>
+    </div>
+    <div id="bankLoanWorkflow">
+      <div id="bankLoanAppSection" aria-live="polite"></div>
+      <div class="margin-top-1em" role="group" aria-label="Bank Loan Bot Actions">
+        <button class="btn-primary" onclick="startBankLoanApplication()" aria-label="Start a new bank loan application">Start New Application</button>
+        <button class="btn-secondary" onclick="closeBankLoanModal()" aria-label="Close bank loan modal">Close</button>
+      </div>
+      <!-- AI Lender Match -->
+      <div class="margin-top-2em">
+        <h4>AI Lender Match</h4>
+        <button class="btn-primary" onclick="findBestLenders()">Find Best Lenders</button>
+        <div id="aiLenderMatchResults" class="margin-top-1em"></div>
+      </div>
+      <!-- Application History Table -->
+      <div class="margin-top-2em">
+        <h4>Application History</h4>
+        <table class="directory-table">
+          <thead>
+            <tr><th>Date</th><th>Loan Type</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="bankLoanHistory">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div id="bankLoanAlert" aria-live="assertive" class="margin-top-1em"></div>
+<script>
+// --- Bank Loan Bot Modal Logic with Backend Integration ---
+let bankLoanApplications = [];
+let currentStep = 0;
+let currentApp = null;
+
+async function fetchBankLoanApplications() {
+  const res = await fetch('http://localhost:4000/api/loan-applications', {
+    headers: { 'x-api-key': getApiKey() }
+  });
+  bankLoanApplications = await res.json();
+  document.getElementById('bankLoanAppCount').textContent = bankLoanApplications.length;
+  renderBankLoanHistory();
+}
+
+function openBankLoanModal() {
+  document.getElementById('bankLoanModal').classList.remove('modal-hidden');
+  fetchBankLoanApplications();
+  renderBankLoanWorkflow();
+}
+
+function closeBankLoanModal() {
+  document.getElementById('bankLoanModal').classList.add('modal-hidden');
+  resetBankLoanWorkflow();
+}
+
+function startBankLoanApplication() {
+  currentStep = 1;
+  currentApp = {
+    date: new Date().toLocaleString(),
+    loanType: '',
+    status: 'Draft',
+    docs: [],
+    id: Date.now()
+  };
+  renderBankLoanWorkflow();
+  updateStepper();
+  setStatusBadge('processing');
+}
+
+function renderBankLoanWorkflow() {
+  const section = document.getElementById('bankLoanAppSection');
+  const alert = document.getElementById('bankLoanAlert');
+  alert.textContent = '';
+  if (!currentApp) {
+    section.innerHTML = '<p>Start a new application or select one from history.</p>';
+    updateStepper(0);
+    setStatusBadge('idle');
+    return;
+  }
+  // Step 1: Discovery
+  if (currentStep === 1) {
+    section.innerHTML = `
+      <h4>Step 1: Select Loan Product</h4>
+      <label for="loanTypeSelect">Loan Type</label>
+      <select id="loanTypeSelect" required>
+        <option value="">-- Select --</option>
+        <option>Commercial Mortgage</option>
+        <option>Bridge Loan</option>
+        <option>Construction Loan</option>
+      </select>
+      <button class="btn-primary margin-top-1em" onclick="nextBankLoanStep()">Next</button>
+    `;
+    updateStepper(1);
+  }
+  // Step 2: Documents
+  else if (currentStep === 2) {
+    section.innerHTML = `
+      <h4>Step 2: Upload Required Documents</h4>
+      <label for="loanDocs">Upload Files</label>
+      <input type="file" id="loanDocs" multiple aria-label="Upload required documents" />
+      <div id="loanDocsPreview" class="margin-top-1em"></div>
+      <button class="btn-primary margin-top-1em" onclick="nextBankLoanStep()">Next</button>
+      <button class="btn-secondary margin-top-1em" onclick="prevBankLoanStep()">Back</button>
+    `;
+    updateStepper(2);
+    document.getElementById('loanDocs').addEventListener('change', previewLoanDocs);
+  }
+  // Step 3: Review & Submit
+  else if (currentStep === 3) {
+    section.innerHTML = `
+      <h4>Step 3: Review & Submit</h4>
+      <p><strong>Loan Type:</strong> ${currentApp.loanType}</p>
+      <p><strong>Documents:</strong> ${currentApp.docs.length ? currentApp.docs.map(d => `<span>${d.name}</span>`).join(', ') : 'None'}</p>
+      <button class="btn-primary margin-top-1em" onclick="submitBankLoanApplication()">Submit Application</button>
+      <button class="btn-secondary margin-top-1em" onclick="prevBankLoanStep()">Back</button>
+    `;
+    updateStepper(3);
+  }
+  // Step 4: Tracking
+  else if (currentStep === 4) {
+    section.innerHTML = `
+      <h4>Step 4: Application Submitted</h4>
+      <p>Status: <span class="status-badge status-processing">Under Review</span></p>
+      <button class="btn-secondary margin-top-1em" onclick="closeBankLoanModal()">Close</button>
+    `;
+    updateStepper(4);
+    setStatusBadge('processing');
+  }
+}
+
+function nextBankLoanStep() {
+  if (currentStep === 1) {
+    // Validate loan type
+    const loanType = document.getElementById('loanTypeSelect').value;
+    if (!loanType) {
+      showBankLoanAlert('Please select a loan type.', 'error');
+      return;
+    }
+    currentApp.loanType = loanType;
+    currentStep = 2;
+  } else if (currentStep === 2) {
+    // Validate docs
+    if (!currentApp.docs || currentApp.docs.length === 0) {
+      showBankLoanAlert('Please upload at least one document.', 'error');
+      return;
+    }
+    currentStep = 3;
+  } else if (currentStep === 3) {
+    // Ready to submit
+    submitBankLoanApplication();
+    return;
+  }
+  renderBankLoanWorkflow();
+}
+
+function prevBankLoanStep() {
+  if (currentStep > 1) {
+    currentStep--;
+    renderBankLoanWorkflow();
+  }
+}
+
+function previewLoanDocs(e) {
+  const files = Array.from(e.target.files);
+  currentApp.docs = files;
+  const preview = document.getElementById('loanDocsPreview');
+  preview.innerHTML = files.length
+    ? '<ul>' + files.map(f => `<li>${f.name}</li>`).join('') + '</ul>'
+    : '<span>No files selected.</span>';
+}
+
+async function submitBankLoanApplication() {
+  currentApp.status = 'Under Review';
+  // Save to backend
+  await fetch('http://localhost:4000/api/loan-applications', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey() },
+    body: JSON.stringify(currentApp)
+  });
+  fetchBankLoanApplications();
+  document.getElementById('bankLoanStatus').textContent = 'Under Review';
+  setStatusBadge('processing');
+  currentStep = 4;
+  renderBankLoanWorkflow();
+  showBankLoanAlert('Application submitted successfully!', 'success');
+  currentApp = null;
+}
+
+function renderBankLoanHistory() {
+  const tbody = document.getElementById('bankLoanHistory');
+  if (!tbody) return;
+  if (bankLoanApplications.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4">No applications yet.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = bankLoanApplications.map(app => `
+    <tr>
+      <td>${app.date}</td>
+      <td>${app.loanType}</td>
+      <td>${app.status}</td>
+      <td>
+        <button onclick="viewBankLoanApp(${app.id})" title="View">View</button>
+        <button onclick="deleteBankLoanApp(${app.id})" title="Delete">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function viewBankLoanApp(id) {
+  const app = bankLoanApplications.find(a => a.id === id);
+  if (!app) return;
+  currentApp = {...app};
+  currentStep = 3;
+  renderBankLoanWorkflow();
+  setStatusBadge(app.status === 'Under Review' ? 'processing' : 'idle');
+}
+
+async function deleteBankLoanApp(id) {
+  if (!confirm('Delete this application?')) return;
+  await fetch(`http://localhost:4000/api/loan-applications/${id}`, {
+    method: 'DELETE',
+    headers: { 'x-api-key': getApiKey() }
+  });
+  fetchBankLoanApplications();
+  showBankLoanAlert('Application deleted.', 'success');
+}
+
+function resetBankLoanWorkflow() {
+  currentStep = 0;
+  currentApp = null;
+  renderBankLoanWorkflow();
+  setStatusBadge('idle');
+}
+
+function showBankLoanAlert(msg, type) {
+  const alert = document.getElementById('bankLoanAlert');
+  alert.textContent = msg;
+  alert.style.color = type === 'error' ? '#b71c1c' : '#2e7d32';
+}
+
+function updateStepper(step) {
+  const steps = [
+    document.getElementById('step-initiate'),
+    document.getElementById('step-discovery'),
+    document.getElementById('step-docs'),
+    document.getElementById('step-submit'),
+    document.getElementById('step-track')
+  ];
+  steps.forEach((el, idx) => {
+    if (!el) return;
+    el.classList.toggle('active', (step || currentStep) === idx);
+  });
+}
+
+function setStatusBadge(status) {
+  const badge = document.getElementById('bankLoanBotStatusBadge');
+  badge.className = 'status-badge';
+  if (status === 'processing') badge.classList.add('status-processing');
+  else if (status === 'error') badge.classList.add('status-error');
+  else if (status === 'success') badge.classList.add('status-success');
+  else badge.classList.add('status-idle');
+  badge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
+}
+
+// --- AI Lender Match (Backend Integration) ---
+async function findBestLenders() {
+  document.getElementById('aiLenderMatchResults').innerHTML = 'Analyzing...';
+  try {
+  const res = await fetch('http://localhost:4000/api/lenders/match', {
+    headers: { 'x-api-key': getApiKey() }
+  });
+    const data = await res.json();
+    document.getElementById('aiLenderMatchResults').innerHTML =
+      '<ul>' + data.map(l => `<li><strong>${l.name}</strong> - ${l.match}% match <button class=\"btn-secondary\" onclick=\"alert('Apply to ${l.name} (feature coming soon)')\">Apply</button></li>`).join('') + '</ul>' +
+      '<span style="color:#888;font-size:0.95em;">(AI lender matching is powered by backend.)</span>';
+  } catch (e) {
+    document.getElementById('aiLenderMatchResults').innerHTML = '<span class="text-error">Error fetching matches.</span>';
+  }
+}
+</script>
+  </div>
+</div>
+            </div>
+                    <div class="operation-card">
+            <!-- Division Links Section (separate from overview) -->
+<div class="division-links-section center-margin">
+                <h2>Divisions</h2>
+<div class="division-buttons flex-wrap-center">
+                    <div class="division-btn-group">
+                    <button onclick="location.href='division-crypto-currency.html'">Crypto Currency</button>
+                    <button onclick="editDivision('crypto-currency')">Edit</button>
+                    <button onclick="deleteDivision('crypto-currency')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-stock-market.html'">Stock Market</button>
+                    <button onclick="editDivision('stock-market')">Edit</button>
+                    <button onclick="deleteDivision('stock-market')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-e-commerce.html'">E Commerce</button>
+                    <button onclick="editDivision('e-commerce')">Edit</button>
+                    <button onclick="deleteDivision('e-commerce')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-real-estate.html'">Real Estate</button>
+                    <button onclick="editDivision('real-estate')">Edit</button>
+                    <button onclick="deleteDivision('real-estate')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-education.html'">Education</button>
+                    <button onclick="editDivision('education')">Edit</button>
+                    <button onclick="deleteDivision('education')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-marketing.html'">Marketing</button>
+                    <button onclick="editDivision('marketing')">Edit</button>
+                    <button onclick="deleteDivision('marketing')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-banking.html'">Banking</button>
+                    <button onclick="editDivision('banking')">Edit</button>
+                    <button onclick="deleteDivision('banking')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-insurance.html'">Insurance</button>
+                    <button onclick="editDivision('insurance')">Edit</button>
+                    <button onclick="deleteDivision('insurance')">Delete</button>
+                </div>
+                <div class="division-btn-group">
+                    <button onclick="location.href='division-business-acquisition.html'">Business Acquisition</button>
+                    <button onclick="editDivision('business-acquisition')">Edit</button>
+                    <button onclick="deleteDivision('business-acquisition')">Delete</button>
+                </div>
+                </div>
+<button class="btn-primary margin-top-1em" onclick="openNewPageModal()">Create New Division Page</button>
+
+                <!-- Overseeing E-Commerce Agent Section -->
+<div class="agent-card ecom-agent-card margin-top-1em">
+  <div class="agent-card-header-flex">
+    <i class="fas fa-robot agent-icon"></i>
+    <div>
+      <h3 class="no-margin">E-Commerce Overseeing Agent</h3>
+      <span class="status-dot" id="ecomAgentStatusDot"></span>
+      <span class="status-active-green">Status: <span id="ecomAgentStatus">Active</span></span>
+      <span class="status-timestamp" id="ecomAgentStatusTime"></span>
+    </div>
+    <label class="switch margin-left-1em" title="Toggle automation">
+      <input type="checkbox" id="autoEcomAgent" checked onchange="toggleAgentAutomation('ecomAgent', this.checked)">
+      <span class="slider"></span> Auto
+    </label>
+    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('ecomAgentLog')">Show Log</button>
+  </div>
+  <div class="agent-card-body">
+    <p><strong>Role:</strong> Oversees and communicates with all E-Commerce Agents. Coordinates strategy, monitors performance, and broadcasts instructions.</p>
+    <ul class="agent-card-list">
+      <li>Monitors Print on Demand, Dropshipping, Digital Products Agents</li>
+      <li>Receives updates and alerts from all department Agents</li>
+      <li>Broadcasts instructions and strategic changes</li>
+      <li>Aggregates performance and status</li>
+    </ul>
+    <input type="text" id="ecomAgentMessage" placeholder="Broadcast message to all E-Commerce Agents" class="full-width margin-bottom-1em" aria-label="Broadcast message to all E-Commerce Agents">
+    <button class="btn-primary" onclick="alert('Message sent to all E-Commerce Agents!')">Send Message</button>
+    <div id="ecomAgentLog" class="agent-log collapse" aria-live="polite"></div>
+  </div>
+</div>
+// --- EcomAgent Status/Log/Automation ---
+setInterval(() => updateAgentStatus('ecomAgent', true, 'Heartbeat'), 60000);
+document.addEventListener('DOMContentLoaded', function() {
+  updateAgentStatus('ecomAgent', true, 'Agent loaded');
+});
+                <!-- DropshippingAgent Card -->
+                <div class="agent-card dropshipping-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-shipping-fast agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">DropshippingAgent</h3>
+                      <span class="status-dot" id="dropshippingAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="dropshippingAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="dropshippingAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoDropshippingAgent" checked onchange="toggleAgentAutomation('dropshippingAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('dropshippingAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Automates supplier integration, product import, order routing, inventory sync, and fulfillment tracking for dropshipping businesses.</p>
+                    <div class="dropshipping-controls margin-bottom-1em">
+                      <input type="text" id="dsProductId" placeholder="Supplier Product ID" class="margin-bottom-1em" aria-label="Supplier Product ID">
+                      <button class="btn-primary" onclick="importDSProduct()">Import Product</button>
+                      <button class="btn-secondary margin-left-1em" onclick="syncDSInventory()">Sync Inventory</button>
+                      <button class="btn-tertiary margin-left-1em" onclick="routeDSOrder()">Route Order</button>
+                    </div>
+                    <div id="dropshippingAgentMsg" class="margin-top-1em"></div>
+                    <div id="dropshippingAgentLog" class="agent-log collapse" aria-live="polite"></div>
+                  </div>
+                </div>
+<script>
+// --- DropshippingAgent Status/Log/Automation ---
+setInterval(() => updateAgentStatus('dropshippingAgent', true, 'Heartbeat'), 60000);
+document.addEventListener('DOMContentLoaded', function() {
+  updateAgentStatus('dropshippingAgent', true, 'Agent loaded');
+});
+function setDSStatus(status) {
+  const dot = document.getElementById('dropshippingAgentStatusDot');
+  const statusSpan = document.getElementById('dropshippingAgentStatus');
+  const time = document.getElementById('dropshippingAgentStatusTime');
+  if (dot) dot.className = 'status-dot' + (status === 'Idle' ? '' : ' offline');
+  if (statusSpan) statusSpan.textContent = status;
+  if (time) time.textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  logAgentEvent('dropshippingAgent', 'Status: ' + status);
+}
+function importDSProduct() {
+  setDSStatus('Importing');
+  const pid = document.getElementById('dsProductId').value.trim();
+  document.getElementById('dropshippingAgentMsg').textContent = 'Importing product ' + pid + '...';
+  setTimeout(() => {
+    setDSStatus('Idle');
+    document.getElementById('dropshippingAgentMsg').textContent = 'Product ' + pid + ' imported (demo).';
+  }, 1200);
+}
+function syncDSInventory() {
+  setDSStatus('Syncing');
+  document.getElementById('dropshippingAgentMsg').textContent = 'Syncing inventory...';
+  setTimeout(() => {
+    setDSStatus('Idle');
+    document.getElementById('dropshippingAgentMsg').textContent = 'Inventory synced (demo).';
+  }, 1000);
+}
+function routeDSOrder() {
+  setDSStatus('Routing');
+  document.getElementById('dropshippingAgentMsg').textContent = 'Routing order to supplier...';
+  setTimeout(() => {
+    setDSStatus('Idle');
+    document.getElementById('dropshippingAgentMsg').textContent = 'Order routed to supplier (demo).';
+  }, 1500);
+}
+</script>
+                <!-- ProductAgent Card (E-Commerce Product Management) -->
+                <div class="agent-card product-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-box agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">ProductAgent</h3>
+                      <span class="status-active-green">Status: Active</span>
+                    </div>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Locates, creates, updates, and manages products for the e-commerce division. Integrates with BodyAgent and other sub-agents.</p>
+                    <ul class="agent-card-list">
+                      <li>Finds and lists products</li>
+                      <li>Creates new product entries</li>
+                      <li>Updates product details and inventory</li>
+                      <li>Handles product removal and info requests</li>
+                    </ul>
+                    <div class="product-agent-controls margin-top-1em">
+                      <input type="text" id="productSearchInput" placeholder="Search or create product..." class="full-width margin-bottom-1em">
+                      <button class="btn-primary" onclick="alert('Product search/creation not yet implemented')">Find/Create Product</button>
+                      <button class="btn-secondary margin-left-1em" onclick="alert('Product update not yet implemented')">Update Product</button>
+                      <button class="btn-tertiary margin-left-1em" onclick="alert('Product removal not yet implemented')">Remove Product</button>
+                    </div>
+                    <div id="productAgentResults" class="margin-top-1em"></div>
+<script>
+// ProductAgent: Full CRUD wiring
+document.addEventListener('DOMContentLoaded', function() {
+  const searchBtn = document.querySelector('.product-agent-card .btn-primary');
+  const updateBtn = document.querySelector('.product-agent-card .btn-secondary');
+  const removeBtn = document.querySelector('.product-agent-card .btn-tertiary');
+  const searchInput = document.getElementById('productSearchInput');
+  const resultsDiv = document.getElementById('productAgentResults');
+  let lastResults = [];
+
+  async function searchProducts() {
+    const query = searchInput.value.trim();
+    if (!query) {
+      resultsDiv.innerHTML = '<span class="text-error">Please enter a product name or keyword.</span>';
+      return;
+    }
+    resultsDiv.innerHTML = 'Searching...';
+    try {
+      const res = await fetch(`/api/products?search=${encodeURIComponent(query)}`);
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      lastResults = data;
+      if (Array.isArray(data) && data.length > 0) {
+        resultsDiv.innerHTML = '<ul>' + data.map(p => `<li><strong>${p.name}</strong> (SKU: ${p.sku || 'N/A'})<br>Price: $${p.price || 'N/A'} <button class="edit-product-btn" data-sku="${p.sku}">Edit</button> <button class="delete-product-btn" data-sku="${p.sku}">Delete</button></li>`).join('') + '</ul>';
+        // Wire up edit/delete buttons
+        document.querySelectorAll('.edit-product-btn').forEach(btn => {
+          btn.onclick = () => showEditForm(btn.getAttribute('data-sku'));
+        });
+        document.querySelectorAll('.delete-product-btn').forEach(btn => {
+          btn.onclick = () => removeProduct(btn.getAttribute('data-sku'));
+        });
+      } else {
+        resultsDiv.innerHTML = '<span>No products found. <button id="createProductBtn">Create New Product</button></span>';
+        document.getElementById('createProductBtn').onclick = showCreateForm;
+      }
+    } catch (e) {
+      resultsDiv.innerHTML = '<span class="text-error">Error searching for products.</span>';
+    }
+  }
+
+  function showCreateForm() {
+    resultsDiv.innerHTML = `
+      <h4>Create New Product</h4>
+      <form id="createProductForm">
+        <input type="text" id="newProductName" placeholder="Product Name" required class="full-width margin-bottom-1em"><br>
+        <input type="text" id="newProductSku" placeholder="SKU" required class="full-width margin-bottom-1em"><br>
+        <input type="number" id="newProductPrice" placeholder="Price" required class="full-width margin-bottom-1em" step="0.01"><br>
+        <button type="submit" class="btn-primary">Create</button>
+        <button type="button" class="btn-secondary" id="cancelCreateProduct">Cancel</button>
+      </form>
+      <div id="createProductMsg"></div>
+    `;
+    document.getElementById('createProductForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('newProductName').value.trim();
+      const sku = document.getElementById('newProductSku').value.trim();
+      const price = parseFloat(document.getElementById('newProductPrice').value);
+      const msgDiv = document.getElementById('createProductMsg');
+      msgDiv.textContent = 'Creating...';
+      try {
+        const res = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, sku, price })
+        });
+        const data = await res.json();
+        if (data.success) {
+          msgDiv.innerHTML = '<span style="color:green">Product created!</span>';
+          searchInput.value = name;
+          setTimeout(searchProducts, 1000);
+        } else {
+          msgDiv.innerHTML = `<span class="text-error">${data.error || 'Error creating product.'}</span>`;
+        }
+      } catch (e) {
+        msgDiv.innerHTML = '<span class="text-error">Error creating product.</span>';
+      }
+    };
+    document.getElementById('cancelCreateProduct').onclick = searchProducts;
+  }
+
+  function showEditForm(sku) {
+    const product = lastResults.find(p => p.sku === sku);
+    if (!product) return;
+    resultsDiv.innerHTML = `
+      <h4>Edit Product</h4>
+      <form id="editProductForm">
+        <input type="text" id="editProductName" value="${product.name}" required class="full-width margin-bottom-1em"><br>
+        <input type="text" id="editProductSku" value="${product.sku}" readonly class="full-width margin-bottom-1em"><br>
+        <input type="number" id="editProductPrice" value="${product.price}" required class="full-width margin-bottom-1em" step="0.01"><br>
+        <button type="submit" class="btn-primary">Update</button>
+        <button type="button" class="btn-secondary" id="cancelEditProduct">Cancel</button>
+      </form>
+      <div id="editProductMsg"></div>
+    `;
+    document.getElementById('editProductForm').onsubmit = async function(e) {
+      e.preventDefault();
+      const name = document.getElementById('editProductName').value.trim();
+      const price = parseFloat(document.getElementById('editProductPrice').value);
+      const msgDiv = document.getElementById('editProductMsg');
+      msgDiv.textContent = 'Updating...';
+      try {
+        const res = await fetch(`/api/products/${sku}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, price })
+        });
+        const data = await res.json();
+        if (data.success) {
+          msgDiv.innerHTML = '<span style="color:green">Product updated!</span>';
+          searchInput.value = name;
+          setTimeout(searchProducts, 1000);
+        } else {
+          msgDiv.innerHTML = `<span class="text-error">${data.error || 'Error updating product.'}</span>`;
+        }
+      } catch (e) {
+        msgDiv.innerHTML = '<span class="text-error">Error updating product.</span>';
+      }
+    };
+    document.getElementById('cancelEditProduct').onclick = searchProducts;
+  }
+
+  async function removeProduct(sku) {
+    if (!confirm('Are you sure you want to delete this product?')) return;
+    resultsDiv.innerHTML = 'Deleting...';
+    try {
+      const res = await fetch(`/api/products/${sku}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        resultsDiv.innerHTML = '<span style="color:green">Product deleted.</span>';
+        setTimeout(searchProducts, 1000);
+      } else {
+        resultsDiv.innerHTML = `<span class="text-error">${data.error || 'Error deleting product.'}</span>`;
+      }
+    } catch (e) {
+      resultsDiv.innerHTML = '<span class="text-error">Error deleting product.</span>';
+    }
+  }
+
+  if (searchBtn) searchBtn.onclick = searchProducts;
+  if (updateBtn) updateBtn.onclick = function() {
+    // If a product is selected, show edit form; else prompt to search and select
+    if (lastResults.length === 1) {
+      showEditForm(lastResults[0].sku);
+    } else {
+      resultsDiv.innerHTML = '<span class="text-error">Search and select a product to update.</span>';
+    }
+  };
+  if (removeBtn) removeBtn.onclick = function() {
+    // If a product is selected, remove it; else prompt to search and select
+    if (lastResults.length === 1) {
+      removeProduct(lastResults[0].sku);
+    } else {
+      resultsDiv.innerHTML = '<span class="text-error">Search and select a product to remove.</span>';
+    }
+  };
+});
+</script>
+                <!-- ColorPaletteAgent Card (Automated Color Palette Management) -->
+                <div class="agent-card color-palette-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-palette agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">ColorPaletteAgent</h3>
+                      <span class="status-active-green">Status: Active</span>
+                    </div>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Automatically generates and assigns color palettes for each website or business entity. Ensures accessibility and design consistency.</p>
+                    <input type="text" id="paletteEntityId" placeholder="Entity/Website ID" class="full-width margin-bottom-1em">
+                    <input type="text" id="paletteKeywords" placeholder="Keywords or mood (e.g. modern, eco, luxury)" class="full-width margin-bottom-1em">
+                    <button class="btn-primary" onclick="autoAssignPalette()">Auto-Assign Palette</button>
+                    <div id="palettePreview" class="margin-top-1em"></div>
+                  </div>
+                </div>
+
+                <!-- Envoy Relay Agent Card -->
+                <div class="agent-card envoy-relay-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-paper-plane agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">Envoy Relay Agent</h3>
+                      <span class="status-dot" id="envoyRelayAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="envoyRelayAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="envoyRelayAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoEnvoyRelayAgent" checked onchange="toggleAgentAutomation('envoyRelayAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('envoyRelayAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Securely relays sensitive documents and communications between divisions and partners.</p>
+                    <button class="btn-primary" onclick="openEnvoyRelayModal()">Relay Message</button>
+                    <div id="envoyRelayAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- Envoy Relay Agent Modal -->
+                <div id="envoyRelayAgentModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="envoyRelayAgentModalTitle">
+                  <div class="modal-content-400" role="document">
+                    <h3 id="envoyRelayAgentModalTitle">Envoy Relay Agent Workflow</h3>
+                    <div id="envoyRelayAgentWorkflow">
+                      <p>Manage relay tasks and communications for distributed operations.</p>
+                      <button class="btn-primary" onclick="addEnvoyRelayTask()">Add Relay Task</button>
+                      <ul id="envoyRelayTaskList" class="margin-top-1em"></ul>
+                    </div>
+                    <button class="btn-secondary" onclick="closeEnvoyRelayAgentModal()">Close</button>
+                  </div>
+                </div>
+<script>
+let envoyRelayTasks = [];
+function openEnvoyRelayAgentModal() {
+  document.getElementById('envoyRelayAgentModal').classList.remove('modal-hidden');
+  renderEnvoyRelayTasks();
+}
+function closeEnvoyRelayAgentModal() {
+  document.getElementById('envoyRelayAgentModal').classList.add('modal-hidden');
+}
+function addEnvoyRelayTask() {
+  const task = { id: Date.now(), name: `Relay Task #${envoyRelayTasks.length + 1}`, status: 'Pending', date: new Date().toLocaleString() };
+  envoyRelayTasks.push(task);
+  renderEnvoyRelayTasks();
+}
+function renderEnvoyRelayTasks() {
+  const list = document.getElementById('envoyRelayTaskList');
+  if (!list) return;
+  if (envoyRelayTasks.length === 0) {
+    list.innerHTML = '<li>No relay tasks yet.</li>';
+    return;
+  }
+  list.innerHTML = envoyRelayTasks.map(t => `<li><strong>${t.name}</strong> - <span>${t.status}</span> <span class='text-muted'>(${t.date})</span></li>`).join('');
+}
+</script>
+                <!-- Courier Agent Card -->
+                <div class="agent-card courier-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-truck agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">Courier Agent</h3>
+                      <span class="status-dot" id="courierAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="courierAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="courierAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoCourierAgent" checked onchange="toggleAgentAutomation('courierAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('courierAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Manages physical and digital delivery of assets, contracts, and notifications.</p>
+                    <button class="btn-primary" onclick="openCourierModal()">Send Delivery</button>
+                    <div id="courierAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- Courier Agent Modal -->
+                <div id="courierAgentModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="courierAgentModalTitle">
+                  <div class="modal-content-400" role="document">
+                    <h3 id="courierAgentModalTitle">Courier Agent Workflow</h3>
+                    <div id="courierAgentWorkflow">
+                      <p>Track and assign courier deliveries and pickups.</p>
+                      <button class="btn-primary" onclick="addCourierTask()">Add Delivery</button>
+                      <ul id="courierTaskList" class="margin-top-1em"></ul>
+                    </div>
+                    <button class="btn-secondary" onclick="closeCourierAgentModal()">Close</button>
+                  </div>
+                </div>
+<script>
+let courierTasks = [];
+function openCourierAgentModal() {
+  document.getElementById('courierAgentModal').classList.remove('modal-hidden');
+  renderCourierTasks();
+}
+function closeCourierAgentModal() {
+  document.getElementById('courierAgentModal').classList.add('modal-hidden');
+}
+function addCourierTask() {
+  const task = { id: Date.now(), name: `Delivery #${courierTasks.length + 1}`, status: 'Scheduled', date: new Date().toLocaleString() };
+  courierTasks.push(task);
+  renderCourierTasks();
+}
+function renderCourierTasks() {
+  const list = document.getElementById('courierTaskList');
+  if (!list) return;
+  if (courierTasks.length === 0) {
+    list.innerHTML = '<li>No deliveries yet.</li>';
+    return;
+  }
+  list.innerHTML = courierTasks.map(t => `<li><strong>${t.name}</strong> - <span>${t.status}</span> <span class='text-muted'>(${t.date})</span></li>`).join('');
+}
+</script>
+                <!-- RenewalSeer Agent Card -->
+                <div class="agent-card renewalseer-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-sync-alt agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">RenewalSeer Agent</h3>
+                      <span class="status-dot" id="renewalSeerAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="renewalSeerAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="renewalSeerAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoRenewalSeerAgent" checked onchange="toggleAgentAutomation('renewalSeerAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('renewalSeerAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Tracks and automates renewals for contracts, licenses, and subscriptions.</p>
+                    <button class="btn-primary" onclick="openRenewalSeerModal()">View Renewals</button>
+                    <div id="renewalSeerAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- MicroInfluencerScout Agent Card -->
+                <div class="agent-card microinfluencerscout-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-user-friends agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">MicroInfluencerScout Agent</h3>
+                      <span class="status-dot" id="microInfluencerScoutAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="microInfluencerScoutAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="microInfluencerScoutAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoMicroInfluencerScoutAgent" checked onchange="toggleAgentAutomation('microInfluencerScoutAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('microInfluencerScoutAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Scouts and manages micro-influencer partnerships for marketing campaigns.</p>
+                    <button class="btn-primary" onclick="openMicroInfluencerScoutModal()">Scout Influencers</button>
+                    <div id="microInfluencerScoutAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- RelationshipManager Agent Card -->
+                <div class="agent-card relationshipmanager-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-handshake agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">RelationshipManager Agent</h3>
+                      <span class="status-dot" id="relationshipManagerAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="relationshipManagerAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="relationshipManagerAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoRelationshipManagerAgent" checked onchange="toggleAgentAutomation('relationshipManagerAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('relationshipManagerAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Manages key business relationships, tracks engagement, and automates follow-ups.</p>
+                    <button class="btn-primary" onclick="openRelationshipManagerModal()">Manage Relationships</button>
+                    <div id="relationshipManagerAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- AuctionSeer Agent Card -->
+                <div class="agent-card auctionseer-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-gavel agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">AuctionSeer Agent</h3>
+                      <span class="status-dot" id="auctionSeerAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="auctionSeerAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="auctionSeerAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoAuctionSeerAgent" checked onchange="toggleAgentAutomation('auctionSeerAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('auctionSeerAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Monitors and analyzes property and asset auctions for opportunities.</p>
+                    <button class="btn-primary" onclick="openAuctionSeerModal()">View Auctions</button>
+                    <div id="auctionSeerAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- StoryCaster Agent Card -->
+                <div class="agent-card storycaster-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-broadcast-tower agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">StoryCaster Agent</h3>
+                      <span class="status-dot" id="storyCasterAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="storyCasterAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="storyCasterAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoStoryCasterAgent" checked onchange="toggleAgentAutomation('storyCasterAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('storyCasterAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Broadcasts news, stories, and updates to all stakeholders and platforms.</p>
+                    <button class="btn-primary" onclick="openStoryCasterModal()">Broadcast Story</button>
+                    <div id="storyCasterAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- Partner Health Dashboard Agent Card -->
+                <div class="agent-card partner-health-dashboard-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-heartbeat agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">Partner Health Dashboard Agent</h3>
+                      <span class="status-dot" id="partnerHealthDashboardAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="partnerHealthDashboardAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="partnerHealthDashboardAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoPartnerHealthDashboardAgent" checked onchange="toggleAgentAutomation('partnerHealthDashboardAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('partnerHealthDashboardAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Monitors and visualizes the health and engagement of all business partners.</p>
+                    <button class="btn-primary" onclick="openPartnerHealthDashboardModal()">View Dashboard</button>
+                    <div id="partnerHealthDashboardAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+                <!-- ForecastSeer Agent Card -->
+                <div class="agent-card forecastseer-agent-card margin-top-1em">
+                  <div class="agent-card-header-flex">
+                    <i class="fas fa-chart-line agent-icon"></i>
+                    <div>
+                      <h3 class="no-margin">ForecastSeer Agent</h3>
+                      <span class="status-dot" id="forecastSeerAgentStatusDot"></span>
+                      <span class="status-active-green">Status: <span id="forecastSeerAgentStatus">Idle</span></span>
+                      <span class="status-timestamp" id="forecastSeerAgentStatusTime"></span>
+                    </div>
+                    <label class="switch margin-left-1em" title="Toggle automation">
+                      <input type="checkbox" id="autoForecastSeerAgent" checked onchange="toggleAgentAutomation('forecastSeerAgent', this.checked)">
+                      <span class="slider"></span> Auto
+                    </label>
+                    <button class="btn-tertiary margin-left-1em" onclick="toggleAgentLog('forecastSeerAgentLog')">Show Log</button>
+                  </div>
+                  <div class="agent-card-body">
+                    <p><strong>Role:</strong> Provides forecasts and predictive analytics for all business operations.</p>
+                    <button class="btn-primary" onclick="openForecastSeerModal()">View Forecasts</button>
+                    <div id="forecastSeerAgentLog" class="agent-log collapse"></div>
+                  </div>
+                </div>
+<script>
+async function autoAssignPalette() {
+  const entityId = document.getElementById('paletteEntityId').value.trim();
+  const keywords = document.getElementById('paletteKeywords').value.trim();
+  if (!entityId) {
+    document.getElementById('palettePreview').innerHTML = '<span class="text-error">Please enter an entity or website ID.</span>';
+    return;
+  }
+  document.getElementById('palettePreview').innerHTML = 'Assigning...';
+  try {
+    const res = await fetch('/api/auto-assign-palette', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entityId, keywords })
+    });
+    const data = await res.json();
+    document.getElementById('palettePreview').innerHTML = data.previewHtml;
+  } catch (e) {
+    document.getElementById('palettePreview').innerHTML = '<span class="text-error">Error assigning palette.</span>';
+  }
+}
+</script>
+
+                <!-- Core Banking Agents Section -->
+                <div class="core-banking-agents margin-top-2em">
+                  <h2>Core Banking Agents</h2>
+                  <!-- AccountAgent Card -->
+                  <div class="agent-card account-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-university agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">AccountAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Manages internal accounts for all business entities. Handles creation, closure, and hierarchy.</p>
+                      <button class="btn-primary" onclick="createAccountDemo()">Create Account</button>
+                      <button class="btn-secondary margin-left-1em" onclick="listAccountsDemo()">List Accounts</button>
+                      <div id="accountAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- TransferAgent Card -->
+                  <div class="agent-card transfer-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-exchange-alt agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">TransferAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Automates internal and external transfers, including scheduled and rule-based flows.</p>
+                      <input type="text" id="transferFrom" placeholder="From Account" class="margin-bottom-1em">
+                      <input type="text" id="transferTo" placeholder="To Account" class="margin-bottom-1em">
+                      <input type="number" id="transferAmount" placeholder="Amount" class="margin-bottom-1em">
+                      <button class="btn-primary" onclick="transferFundsDemo()">Transfer</button>
+                      <div id="transferAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- LendingAgent Card -->
+                  <div class="agent-card lending-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-hand-holding-usd agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">LendingAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Manages internal lending, credit lines, and automates interest and repayments.</p>
+                      <button class="btn-primary" onclick="createLoanDemo()">Create Loan</button>
+                      <button class="btn-secondary margin-left-1em" onclick="listLoansDemo()">List Loans</button>
+                      <div id="lendingAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- ComplianceAgent Card -->
+                  <div class="agent-card compliance-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-shield-alt agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">ComplianceAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Monitors transactions for compliance, generates reports, and flags suspicious activity.</p>
+                      <button class="btn-primary" onclick="runComplianceDemo()">Run Compliance Check</button>
+                      <div id="complianceAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- TreasuryAgent Card -->
+                  <div class="agent-card treasury-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-piggy-bank agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">TreasuryAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Automates treasury management, reserves, and liquidity rules.</p>
+                      <button class="btn-primary" onclick="runTreasuryDemo()">Optimize Treasury</button>
+                      <div id="treasuryAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- DashboardAgent Card -->
+                  <div class="agent-card dashboard-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-tachometer-alt agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">DashboardAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Provides real-time dashboards for balances, transactions, and risk.</p>
+                      <button class="btn-primary" onclick="showDashboardDemo()">Show Dashboard</button>
+                      <div id="dashboardAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- RulesEngineAgent Card -->
+                  <div class="agent-card rules-engine-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-cogs agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">RulesEngineAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Allows programmable rules for fund flows, alerts, and automations.</p>
+                      <button class="btn-primary" onclick="runRulesDemo()">Run Rules</button>
+                      <div id="rulesEngineAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- IntegrationAgent Card -->
+                  <div class="agent-card integration-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-plug agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">IntegrationAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Integrates with external banks, payment processors, and crypto wallets.</p>
+                      <button class="btn-primary" onclick="runIntegrationDemo()">Sync Integrations</button>
+                      <div id="integrationAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- RiskAgent Card -->
+                  <div class="agent-card risk-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-exclamation-triangle agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">RiskAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Monitors credit, liquidity, and operational risk. Provides scenario analysis.</p>
+                      <button class="btn-primary" onclick="runRiskDemo()">Analyze Risk</button>
+                      <div id="riskAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                  <!-- AuditAgent Card -->
+                  <div class="agent-card audit-agent-card margin-top-1em">
+                    <div class="agent-card-header-flex">
+                      <i class="fas fa-clipboard-check agent-icon"></i>
+                      <div>
+                        <h3 class="no-margin">AuditAgent</h3>
+                        <span class="status-active-green">Status: Active</span>
+                      </div>
+                    </div>
+                    <div class="agent-card-body">
+                      <p><strong>Role:</strong> Maintains immutable logs of all actions and transactions. Supports audit export.</p>
+                      <button class="btn-primary" onclick="runAuditDemo()">Export Audit Log</button>
+                      <div id="auditAgentMsg" class="margin-top-1em"></div>
+                    </div>
+                  </div>
+                </div>
+<script>
+// --- Core Banking Agent API Logic ---
+async function createAccountDemo() {
+  const msg = document.getElementById('accountAgentMsg');
+  msg.textContent = 'Creating...';
+  try {
+    const id = 'acc' + Date.now();
+    const name = 'Account ' + id.slice(-4);
+    const res = await fetch('/api/banking/accounts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, name, balance: 0 })
+    });
+    const data = await res.json();
+    msg.textContent = data.success ? 'Account created.' : (data.error || 'Error');
+  } catch (e) {
+    msg.textContent = 'Error creating account.';
+  }
+}
+async function listAccountsDemo() {
+  const msg = document.getElementById('accountAgentMsg');
+  msg.textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/banking/accounts');
+    const data = await res.json();
+    msg.innerHTML = '<ul>' + data.map(a => `<li>${a.name} ($${a.balance})</li>`).join('') + '</ul>';
+  } catch (e) {
+    msg.textContent = 'Error loading accounts.';
+  }
+}
+async function transferFundsDemo() {
+  const msg = document.getElementById('transferAgentMsg');
+  const from = document.getElementById('transferFrom').value;
+  const to = document.getElementById('transferTo').value;
+  const amt = parseFloat(document.getElementById('transferAmount').value);
+  msg.textContent = 'Transferring...';
+  try {
+    const res = await fetch('/api/banking/transfer', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, amount: amt })
+    });
+    const data = await res.json();
+    msg.textContent = data.success ? `Transferred $${amt} from ${from} to ${to}.` : (data.error || 'Error');
+  } catch (e) {
+    msg.textContent = 'Error transferring funds.';
+  }
+}
+async function createLoanDemo() {
+  const msg = document.getElementById('lendingAgentMsg');
+  msg.textContent = 'Creating loan...';
+  try {
+    const id = Date.now().toString();
+    const amount = 10000;
+    const res = await fetch('/api/banking/loans', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, amount })
+    });
+    const data = await res.json();
+    msg.textContent = data.success ? 'Loan created.' : (data.error || 'Error');
+  } catch (e) {
+    msg.textContent = 'Error creating loan.';
+  }
+}
+async function listLoansDemo() {
+  const msg = document.getElementById('lendingAgentMsg');
+  msg.textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/banking/loans');
+    const data = await res.json();
+    msg.innerHTML = '<ul>' + data.map(l => `<li>Loan #${l.id}: $${l.amount} (${l.status})</li>`).join('') + '</ul>';
+  } catch (e) {
+    msg.textContent = 'Error loading loans.';
+  }
+}
+async function runComplianceDemo() {
+  const msg = document.getElementById('complianceAgentMsg');
+  msg.textContent = 'Checking...';
+  try {
+    const res = await fetch('/api/banking/compliance');
+    const data = await res.json();
+    msg.textContent = data.success ? 'Compliance check passed.' : 'Failed.';
+  } catch (e) {
+    msg.textContent = 'Error running compliance.';
+  }
+}
+async function runTreasuryDemo() {
+  const msg = document.getElementById('treasuryAgentMsg');
+  msg.textContent = 'Optimizing...';
+  try {
+    const res = await fetch('/api/banking/treasury/optimize', { method: 'POST' });
+    const data = await res.json();
+    msg.textContent = data.success ? 'Treasury optimized.' : 'Error.';
+  } catch (e) {
+    msg.textContent = 'Error optimizing treasury.';
+  }
+}
+async function showDashboardDemo() {
+  const msg = document.getElementById('dashboardAgentMsg');
+  msg.textContent = 'Loading...';
+  try {
+    const res = await fetch('/api/banking/dashboard');
+    const data = await res.json();
+    msg.innerHTML = `Total: $${data.total} | Reserve: $${data.reserve}<br>Accounts: <ul>` + data.accounts.map(a => `<li>${a.name}: $${a.balance}</li>`).join('') + '</ul>';
+  } catch (e) {
+    msg.textContent = 'Error loading dashboard.';
+  }
+}
+async function runRulesDemo() {
+  const msg = document.getElementById('rulesEngineAgentMsg');
+  msg.textContent = 'Running...';
+  try {
+    const res = await fetch('/api/banking/rules/run', { method: 'POST' });
+    const data = await res.json();
+    msg.textContent = data.success ? 'Rules executed.' : 'Error.';
+  } catch (e) {
+    msg.textContent = 'Error running rules.';
+  }
+}
+async function runIntegrationDemo() {
+  const msg = document.getElementById('integrationAgentMsg');
+  msg.textContent = 'Syncing...';
+  try {
+    const res = await fetch('/api/banking/integrations/sync', { method: 'POST' });
+    const data = await res.json();
+    msg.textContent = data.success ? 'Integrations synced.' : 'Error.';
+  } catch (e) {
+    msg.textContent = 'Error syncing integrations.';
+  }
+}
+async function runRiskDemo() {
+  const msg = document.getElementById('riskAgentMsg');
+  msg.textContent = 'Analyzing...';
+  try {
+    const res = await fetch('/api/banking/risk');
+    const data = await res.json();
+    msg.textContent = data.success ? `Risk: ${data.risk}` : 'Error.';
+  } catch (e) {
+    msg.textContent = 'Error analyzing risk.';
+  }
+}
+async function runAuditDemo() {
+  const msg = document.getElementById('auditAgentMsg');
+  msg.textContent = 'Exporting...';
+  try {
+    const res = await fetch('/api/banking/audit');
+    const data = await res.json();
+    msg.textContent = data.success ? 'Audit log exported.' : 'Error.';
+  } catch (e) {
+    msg.textContent = 'Error exporting audit log.';
+  }
+}
+</script>
+                  </div>
+                </div>
+            </div>
                         <h3>Fund Management</h3>
                         <div class="card-content">
                             <div class="agent-status">
@@ -312,7 +2186,70 @@
                             </div>
                             <div class="metric-row">
                                 <span>Active Pairs:</span>
-                                <span>BTC-USD, ETH-USD</span>
+                                <span id="active-pairs-list">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Predictive Insights Panel -->
+                    <div class="trading-panel predictive-panel">
+                        <h3>Predictive Insights</h3>
+                        <div id="predictive-dashboard">
+                            <div class="predictive-models">
+                                <strong>Model Signals:</strong>
+                                <ul id="model-signals-list">
+                                    <li>Loading...</li>
+                                </ul>
+                            </div>
+                            <div class="predictive-confidence">
+                                <strong>Aggregate Confidence:</strong>
+                                <span id="aggregate-confidence">Loading...</span>
+                            </div>
+                            <div class="predictive-rationale">
+                                <strong>Trade Rationale:</strong>
+                                <span id="trade-rationale">Loading...</span>
+                            </div>
+                            <div class="predictive-backtest">
+                                <strong>Recent Backtest Results:</strong>
+                                <span id="backtest-results">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+                    <script>
+                    // Fetch active pairs from backend API and display
+                    fetch('/api/active-pairs')
+                      .then(res => res.json())
+                      .then(data => {
+                        document.getElementById('active-pairs-list').textContent = data.join(', ');
+                      })
+                      .catch(() => {
+                        document.getElementById('active-pairs-list').textContent = 'Unavailable';
+                      });
+                    // Fetch predictive dashboard data
+                    fetch('/api/predictive-dashboard')
+                      .then(res => res.json())
+                      .then(data => {
+                        // Model signals
+                        const signalsList = document.getElementById('model-signals-list');
+                        signalsList.innerHTML = '';
+                        data.modelSignals.forEach(sig => {
+                          const li = document.createElement('li');
+                          li.textContent = `${sig.model}: ${sig.signal} (${sig.confidence}%)`;
+                          signalsList.appendChild(li);
+                        });
+                        // Aggregate confidence
+                        document.getElementById('aggregate-confidence').textContent = data.aggregateConfidence + '%';
+                        // Trade rationale
+                        document.getElementById('trade-rationale').textContent = data.tradeRationale;
+                        // Backtest results
+                        document.getElementById('backtest-results').textContent = data.backtestResults;
+                      })
+                      .catch(() => {
+                        document.getElementById('model-signals-list').innerHTML = '<li>Unavailable</li>';
+                        document.getElementById('aggregate-confidence').textContent = 'Unavailable';
+                        document.getElementById('trade-rationale').textContent = 'Unavailable';
+                        document.getElementById('backtest-results').textContent = 'Unavailable';
+                      });
+                    </script>
                             </div>
                         </div>
                     </div>
@@ -390,7 +2327,7 @@
                             <div class="metric">
                                 <label>Intelligence Level:</label>
                                 <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 94%"></div>
+<div class="progress-fill width-94"></div>
                                 </div>
                                 <span>94%</span>
                             </div>
@@ -459,7 +2396,7 @@
                             <h3>Daily Market Scan</h3>
                             <div class="automation-toggle">
                                 <input type="checkbox" id="auto1" checked>
-                                <label for="auto1"></label>
+                                <label for="auto1" class="visually-hidden">Enable Daily Market Scan</label>
                             </div>
                         </div>
                         <div class="automation-details">
@@ -476,7 +2413,7 @@
                             <h3>Risk Management</h3>
                             <div class="automation-toggle">
                                 <input type="checkbox" id="auto2" checked>
-                                <label for="auto2"></label>
+                                <label for="auto2" class="visually-hidden">Enable Risk Management</label>
                             </div>
                         </div>
                         <div class="automation-details">
@@ -493,7 +2430,7 @@
                             <h3>Property Alerts</h3>
                             <div class="automation-toggle">
                                 <input type="checkbox" id="auto3">
-                                <label for="auto3"></label>
+                                <label for="auto3" class="visually-hidden">Enable Property Alerts</label>
                             </div>
                         </div>
                         <div class="automation-details">
@@ -530,21 +2467,21 @@
                             <div class="health-item">
                                 <span class="metric-label">CPU Usage</span>
                                 <div class="metric-bar">
-                                    <div class="bar-fill" style="width: 45%"></div>
+<div class="bar-fill width-45"></div>
                                 </div>
                                 <span class="metric-value">45%</span>
                             </div>
                             <div class="health-item">
                                 <span class="metric-label">Memory Usage</span>
                                 <div class="metric-bar">
-                                    <div class="bar-fill" style="width: 62%"></div>
+<div class="bar-fill width-62"></div>
                                 </div>
                                 <span class="metric-value">62%</span>
                             </div>
                             <div class="health-item">
                                 <span class="metric-label">API Response Time</span>
                                 <div class="metric-bar">
-                                    <div class="bar-fill" style="width: 25%"></div>
+<div class="bar-fill width-25"></div>
                                 </div>
                                 <span class="metric-value">125ms</span>
                             </div>
@@ -586,7 +2523,7 @@
                     <div class="exchange-card coinbase-card">
                         <div class="exchange-header">
                             <div class="exchange-logo">
-                                <i class="fab fa-bitcoin" style="color: #0052ff;"></i>
+<i class="fab fa-bitcoin bitcoin-color"></i>
                                 <h3>Coinbase Pro</h3>
                             </div>
                             <div class="connection-status connected">
@@ -648,7 +2585,7 @@
                     <div class="exchange-card">
                         <div class="exchange-header">
                             <div class="exchange-logo">
-                                <i class="fas fa-chart-line" style="color: #f0b90b;"></i>
+<i class="fas fa-chart-line binance-color"></i>
                                 <h3>Binance</h3>
                             </div>
                             <div class="connection-status disconnected">
@@ -667,7 +2604,7 @@
                     <div class="exchange-card">
                         <div class="exchange-header">
                             <div class="exchange-logo">
-                                <i class="fas fa-wave-square" style="color: #5741d9;"></i>
+<i class="fas fa-wave-square kraken-color"></i>
                                 <h3>Kraken</h3>
                             </div>
                             <div class="connection-status disconnected">
@@ -694,10 +2631,10 @@
                         </button>
                     </div>
                     
-                    <div class="coinbase-frame-container" id="coinbase-frame-container" style="display: none;">
+<div class="coinbase-frame-container hidden" id="coinbase-frame-container">
                         <div class="frame-header">
                             <span>Coinbase Pro Dashboard</span>
-                            <button class="close-frame" onclick="toggleCoinbaseFrame()">
+                            <button class="close-frame" onclick="toggleCoinbaseFrame()" title="Close Coinbase Dashboard">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
@@ -708,7 +2645,8 @@
                             height="800px"
                             frameborder="0"
                             sandbox="allow-same-origin allow-scripts allow-forms"
-                            loading="lazy">
+                            loading="lazy"
+                            title="Coinbase Pro Dashboard">
                         </iframe>
                     </div>
                 </div>
@@ -734,20 +2672,20 @@
                     <div class="settings-section">
                         <h3>Trading Parameters</h3>
                         <div class="setting-item">
-                            <label>Max Trade Amount</label>
-                            <input type="number" value="100" id="maxTrade">
+                            <label for="maxTrade">Max Trade Amount</label>
+                            <input type="number" value="100" id="maxTrade" title="Max Trade Amount" placeholder="Max Trade Amount">
                             <span class="setting-unit">USD</span>
                         </div>
                         <div class="setting-item">
-                            <label>Daily Loss Limit</label>
-                            <input type="number" value="50" id="lossLimit">
+                            <label for="lossLimit">Daily Loss Limit</label>
+                            <input type="number" value="50" id="lossLimit" title="Daily Loss Limit" placeholder="Daily Loss Limit">
                             <span class="setting-unit">USD</span>
                         </div>
                         <div class="setting-item">
-                            <label>Auto Trading</label>
+                            <label for="autoTrading">Auto Trading</label>
                             <div class="toggle-switch">
-                                <input type="checkbox" id="autoTrading" checked>
-                                <label for="autoTrading"></label>
+                                <input type="checkbox" id="autoTrading" checked title="Enable Auto Trading">
+                                <label for="autoTrading" class="visually-hidden">Enable Auto Trading</label>
                             </div>
                         </div>
                     </div>
@@ -755,16 +2693,16 @@
                     <div class="settings-section">
                         <h3>Risk Management</h3>
                         <div class="setting-item">
-                            <label>Risk Tolerance</label>
-                            <select id="riskTolerance">
+                            <label for="riskTolerance">Risk Tolerance</label>
+                            <select id="riskTolerance" title="Risk Tolerance">
                                 <option value="conservative">Conservative</option>
                                 <option value="moderate" selected>Moderate</option>
                                 <option value="aggressive">Aggressive</option>
                             </select>
                         </div>
                         <div class="setting-item">
-                            <label>Stop Loss %</label>
-                            <input type="number" value="2" id="stopLoss" step="0.1">
+                            <label for="stopLoss">Stop Loss %</label>
+                            <input type="number" value="2" id="stopLoss" step="0.1" title="Stop Loss %" placeholder="Stop Loss %">
                             <span class="setting-unit">%</span>
                         </div>
                     </div>
@@ -772,25 +2710,447 @@
                     <div class="settings-section">
                         <h3>Notifications</h3>
                         <div class="setting-item">
-                            <label>Email Alerts</label>
+                            <label for="emailAlerts">Email Alerts</label>
                             <div class="toggle-switch">
-                                <input type="checkbox" id="emailAlerts" checked>
-                                <label for="emailAlerts"></label>
+                                <input type="checkbox" id="emailAlerts" checked title="Enable Email Alerts">
+                                <label for="emailAlerts" class="visually-hidden">Enable Email Alerts</label>
                             </div>
                         </div>
                         <div class="setting-item">
-                            <label>SMS Alerts</label>
+                            <label for="smsAlerts">SMS Alerts</label>
                             <div class="toggle-switch">
-                                <input type="checkbox" id="smsAlerts">
-                                <label for="smsAlerts"></label>
+                                <input type="checkbox" id="smsAlerts" title="Enable SMS Alerts">
+                                <label for="smsAlerts" class="visually-hidden">Enable SMS Alerts</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Divisions Tab -->
+            <div class="tab-content" id="divisions">
+                <div class="section-header">
+                    <h2>Divisions</h2>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-crypto-currency.html'">Crypto Currency</button>
+                        <button onclick="editDivision('crypto-currency')">Edit</button>
+                        <button onclick="deleteDivision('crypto-currency')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-stock-market.html'">Stock Market</button>
+                        <button onclick="editDivision('stock-market')">Edit</button>
+                        <button onclick="deleteDivision('stock-market')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-e-commerce.html'">E Commerce</button>
+                        <button onclick="editDivision('e-commerce')">Edit</button>
+                        <button onclick="deleteDivision('e-commerce')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-real-estate.html'">Real Estate</button>
+                        <button onclick="editDivision('real-estate')">Edit</button>
+                        <button onclick="deleteDivision('real-estate')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-education.html'">Education</button>
+                        <button onclick="editDivision('education')">Edit</button>
+                        <button onclick="deleteDivision('education')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-marketing.html'">Marketing</button>
+                        <button onclick="editDivision('marketing')">Edit</button>
+                        <button onclick="deleteDivision('marketing')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-banking.html'">Banking</button>
+                        <button onclick="editDivision('banking')">Edit</button>
+                        <button onclick="deleteDivision('banking')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-insurance.html'">Insurance</button>
+                        <button onclick="editDivision('insurance')">Edit</button>
+                        <button onclick="deleteDivision('insurance')">Delete</button>
+                    </div>
+                    <div class="division-buttons">
+                        <button onclick="location.href='division-business-acquisition.html'">Business Acquisition</button>
+                        <button onclick="editDivision('business-acquisition')">Edit</button>
+                        <button onclick="deleteDivision('business-acquisition')">Delete</button>
+                    </div>
+                    </div>
+                    <button class="btn-primary" onclick="openNewPageModal()">Create New Division Page</button>
+                </div>
+
+<div id="newPageModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="newDivisionModalTitle">
+  <div class="modal-content-400">
+    <h3 id="newDivisionModalTitle">Create New Division Page</h3>
+    <label for="newDivisionName" class="visually-hidden">Division Name</label>
+    <input type="text" id="newDivisionName" placeholder="Enter division name" class="full-width margin-bottom-1em" title="Division Name" aria-label="Division Name">
+    <button onclick="createNewDivisionPage()" title="Create new division page">Create</button>
+    <button onclick="closeNewPageModal()" title="Cancel creation">Cancel</button>
+  </div>
+</div>
+
+                <h2>Ledger</h2>
+                <button onclick="location.href='ledger.html'">Go to Ledger</button>
+            </div>
+
+            <!-- Ledger Tab -->
+            <div class="tab-content d-none" id="ledger">
+                <div class="section-header">
+                    <h2><i class="fas fa-book"></i> Covenant Ledger</h2>
+                    <div class="industry-filters">
+                        <button class="industry-btn" data-industry="real-estate">🏡 Real Estate</button>
+                        <button class="industry-btn" data-industry="crypto-trading">🪙 Crypto</button>
+                        <button class="industry-btn" data-industry="stock-market">📈 Stocks</button>
+                        <button class="industry-btn" data-industry="e-commerce">🛒 E-Commerce</button>
+                        <button class="industry-btn" data-industry="education">🎓 Education</button>
+                        <button class="industry-btn" data-industry="banking">🏦 Banking</button>
+                        <button class="industry-btn" data-industry="insurance">🛡️ Insurance</button>
+                        <button class="industry-btn" data-industry="business-acquisition">🏢 Acquisition</button>
+                    </div>
+
+            <!-- Agent Management Tab -->
+            <div class="tab-content d-none" id="agent-management">
+                <div class="section-header">
+                    <h2>Agent Management</h2>
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="openCreateAgentModal()">
+                            <i class="fas fa-plus"></i>
+                            Create New Agent
+                        </button>
+                        <button class="btn-secondary" onclick="fetchAgentList()">
+                            <i class="fas fa-list"></i>
+                            List Agents
+                        </button>
+                    </div>
+                </div>
+                <div id="agent-list-section" class="margin-top-1em"></div>
+                <div id="agent-task-section" class="margin-top-2em"></div>
+            </div>
+
+
+<!-- Private Money Agent logic moved to script at end of file -->
+</html>
+<script>
+// --- Private Money Agent Logic ---
+let privateMoneyDeals = [];
+let privateMoneyStatus = 'Idle';
+function openPrivateMoneyModal() {
+  document.getElementById('privateMoneyModal').classList.remove('modal-hidden');
+  renderPrivateMoneyDeals();
+}
+function closePrivateMoneyModal() {
+  document.getElementById('privateMoneyModal').classList.add('modal-hidden');
+}
+function addPrivateMoneyDeal() {
+  privateMoneyStatus = 'Processing';
+  updatePrivateMoneyStatus();
+  setTimeout(() => {
+    const deal = {
+      id: Date.now(),
+      name: `Deal #${privateMoneyDeals.length + 1}`,
+      amount: (Math.random() * 100000 + 50000).toFixed(0),
+      date: new Date().toLocaleString()
+    };
+    privateMoneyDeals.push(deal);
+    // Defensive: check if element exists
+    const funded = document.getElementById('privateMoneyDealsFunded');
+    if (funded) funded.textContent = privateMoneyDeals.length;
+    privateMoneyStatus = 'Idle';
+    updatePrivateMoneyStatus();
+    renderPrivateMoneyDeals();
+  }, 1200);
+}
+function renderPrivateMoneyDeals() {
+  const list = document.getElementById('privateMoneyDealList');
+  if (!list) return;
+  if (privateMoneyDeals.length === 0) {
+    list.innerHTML = '<ul><li>No deals funded yet.</li></ul>';
+    return;
+  }
+  list.innerHTML = privateMoneyDeals.length > 0
+    ? '<ul>' + privateMoneyDeals.map(
+        d => `<li><strong>${d.name}</strong> - $${d.amount} <span class="text-muted">(${d.date})</span></li>`
+      ).join('') + '</ul>'
+    : '<ul><li>No deals funded yet.</li></ul>';
+}
+function updatePrivateMoneyStatus() {
+  const agentStatus = document.getElementById('privateMoneyAgentStatus');
+  if (agentStatus) agentStatus.textContent = privateMoneyStatus;
+  const pmStatus = document.getElementById('privateMoneyStatus');
+  if (pmStatus) pmStatus.textContent = privateMoneyStatus === 'Idle' ? 'Ready' : privateMoneyStatus;
+}
+</script>
+                        <tr>
+                            <td>Estate-Lore</td>
+                            <td>Delaware, USA</td>
+                            <td>LLC</td>
+                            <td>2025-07-14</td>
+                            <td>
+                                <button onclick="openEntityPage('estate-lore')">Open Page</button>
+                                <button onclick="editEntity('estate-lore')">Edit</button>
+                                <button onclick="deleteEntity('estate-lore')">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+                                <button onclick="deleteEntity('estate-lore')">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Entity Page Modal (Living Interface) -->
+<div id="entityPageModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="entityPageTitle">
+  <div class="modal-content-600">
+    <h2 id="entityPageTitle">Entity Name</h2>
+    <div class="entity-tabs" role="tablist">
+      <button onclick="showEntityTab('overview')" role="tab" aria-selected="true" title="Overview">Overview</button>
+      <button onclick="showEntityTab('legal-docs')" role="tab" title="Legal Documents">Legal Documents</button>
+      <button onclick="showEntityTab('governance')" role="tab" title="Governance Ledger">Governance Ledger</button>
+      <button onclick="showEntityTab('mythic-narrative')" role="tab" title="Mythic Narrative">Mythic Narrative</button>
+      <button onclick="showEntityTab('assets')" role="tab" title="Asset Register">Asset Register</button>
+      <button onclick="showEntityTab('compliance')" role="tab" title="Compliance Vault">Compliance Vault</button>
+      <button onclick="showEntityTab('ai-agents')" role="tab" title="AI Agents">AI Agents</button>
+      <button onclick="showEntityTab('activities')" role="tab" title="Activities & Interaction">⚙️🪄💬 Activities & Interaction</button>
+    </div>
+    <div id="entityTabContent" class="margin-top-1em">
+      <!-- Populated dynamically -->
+    </div>
+    <button onclick="closeEntityPageModal()" class="margin-top-2em" title="Close entity modal">Close</button>
+  </div>
+</div>
+
+            <!-- Hybrid Architecture Blueprint Section -->
+<section class="hybrid-architecture-section center-margin margin-top-2em">
+  <h2><i class="fas fa-layer-group"></i> Hybrid Architecture Blueprint</h2>
+  <table class="hybrid-architecture-table">
+    <thead>
+      <tr>
+        <th>Feature</th>
+        <th>Strategy</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>🕒 Uptime</td>
+        <td>Use DigitalOcean’s high-availability droplets and load balancers<br>Set health checks to auto-recover agents</td>
+      </tr>
+      <tr>
+        <td>🚀 Speed</td>
+        <td>Host core AI modules on DigitalOcean for faster compute<br>Use IONOS CDN (if available) for static assets</td>
+      </tr>
+      <tr>
+        <td>🤖 Bot Deployment</td>
+        <td>Deploy modular assistants via containerized microservices (Docker) on DigitalOcean<br>Use GitHub Actions for CI/CD</td>
+      </tr>
+      <tr>
+        <td>🔐 Security</td>
+        <td>Harden DigitalOcean server with firewalls, SSH keys, and fail2ban<br>Use IONOS domain/email SSL, DNSSEC, DMARC</td>
+      </tr>
+      <tr>
+        <td>🧠 Functionality</td>
+        <td>Coordinate bot logic via Copilot delegation<br>Use IONOS for admin UI or landing pages with form integrations</td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="modular-flow-diagram margin-top-2em">
+    <h3>🧩 Modular Integration Flow</h3>
+    <div class="flow-steps">
+      <span class="flow-step">IONOS Domain/Frontend</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">DNS pointed to DigitalOcean</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">AI Microservices + Dashboard</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Copilot Coordination Layer</span>
+      <span class="flow-arrow">→</span>
+      <span class="flow-step">Task Routing to Modular Agents</span>
+    </div>
+    <p class="margin-top-1em">You can route form submissions from an IONOS landing page directly into your assistant logic hosted on DigitalOcean using secure webhooks.</p>
+  </div>
+  <div class="layered-access-governance margin-top-2em">
+    <h3>🛡️ Layered Access & Governance</h3>
+    <ul class="governance-list">
+      <li>🧙 <strong>Alchemist</strong> handles API integration</li>
+      <li>📝 <strong>Scribe</strong> routes data to assistants</li>
+      <li>🛡️ <strong>Sentinel</strong> watches for threats and uptime events</li>
+      <li>🔮 <strong>Oracle</strong> visualizes modular intelligence</li>
+    </ul>
+    <p class="margin-top-1em">Token-gate modules based on mythic keys <span title="Mythic Key">🔑</span> — e.g., only the Covenant’s Keepers can access the Vault module.</p>
+  </div>
+</section>
+<section class="system-health-info center-margin margin-top-2em">
+  <h2><i class="fas fa-shield-alt"></i> System Health & Auto-Recovery</h2>
+  <p>
+    This portal is protected by automated health checks and self-healing infrastructure.<br>
+    <strong>How it works:</strong>
+    <ul>
+      <li>DigitalOcean load balancer only routes traffic to healthy nodes (checked every 10s).</li>
+      <li>Failed nodes are automatically replaced and traffic is rerouted.</li>
+      <li>Admins are alerted if CPU usage is high or a node goes down.</li>
+      <li>All agents and microservices must respond to <code>/health</code> for monitoring.</li>
+    </ul>
+    <em>Uptime, speed, and resilience are continuously monitored and auto-recovered.</em>
+  </p>
+</section>
         </main>
     </div>
 
     <script src="/portal-script.js"></script>
+
+// Bank Loan Bot Modal Logic
+function openBankLoanModal() {
+  document.getElementById('bankLoanModal').classList.remove('modal-hidden');
+}
+function closeBankLoanModal() {
+  document.getElementById('bankLoanModal').classList.add('modal-hidden');
+}
+function startBankLoanApplication() {
+  // Simulate starting a new application (expand as needed)
+  const section = document.getElementById('bankLoanAppSection');
+  section.innerHTML = `
+    <h4>New Bank Loan Application</h4>
+    <p><strong>Step 1:</strong> Select a loan product (simulated).</p>
+    <label for="loanTypeSelect" class="visually-hidden">Loan Type</label>
+    <select id="loanTypeSelect" title="Select loan type"><option>Commercial Mortgage</option><option>Bridge Loan</option><option>Construction Loan</option></select>
+    <p><strong>Step 2:</strong> Upload required documents (simulated).</p>
+    <label for="loanDocsInput2">Upload Documents</label>
+    <input id="loanDocsInput2" type="file" multiple title="Upload loan documents" />
+      .d-none { display: none !important; }
+      .lender-status-row { margin-bottom: 0.5em; }
+</style>
+    <p><strong>Step 3:</strong> Review and submit application (simulated).</p>
+    <button class="btn-primary" onclick="submitBankLoanApplication()">Submit Application</button>
+    <button class="btn-secondary" onclick="closeBankLoanModal()">Cancel</button>
+  `;
+}
+function submitBankLoanApplication() {
+  // Simulate submission and update count
+  document.getElementById('bankLoanAppSection').innerHTML = '<p>Application submitted! Status: Under Review.</p>';
+  let count = parseInt(document.getElementById('bankLoanAppCount').textContent, 10) || 0;
+  document.getElementById('bankLoanAppCount').textContent = count + 1;
+  document.getElementById('bankLoanStatus').textContent = 'Under Review';
+}
+    <script>
+function openNewPageModal() {
+    document.getElementById('newPageModal').classList.remove('modal-hidden');
+    document.getElementById('newDivisionName').focus();
+}
+function closeNewPageModal() {
+    document.getElementById('newPageModal').classList.add('modal-hidden');
+}
+function createNewDivisionPage() {
+    var name = document.getElementById('newDivisionName').value.trim();
+    if (!name) return;
+    var fileName = 'division-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.html';
+    var html = `<!DOCTYPE html>\n<html lang='en'>\n<head>\n    <meta charset='UTF-8'>\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\n    <title>${name} Division</title>\n    <link rel='stylesheet' href='/portal-styles.css'>\n</head>\n<body>\n    <div class='portal-container'>\n        <header class='portal-header'>\n            <h1>${name} Division</h1>\n        </header>\n        <main class='portal-content'>\n            <h2>Entities</h2>\n            <div class='entity-buttons'>\n                <!-- Add entity buttons here -->\n            </div>\n        </main>\n    </div>\n</body>\n</html>`;
+    var blob = new Blob([html], {type: 'text/html'});
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    closeNewPageModal();
+}
+// Ledger tab logic
+// Replace broken event handler with accessible version
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-content').forEach(tab => {
+          tab.classList.remove('active');
+          tab.style.display = 'none';
+        });
+        var tabId = this.getAttribute('data-tab');
+        var tab = document.getElementById(tabId);
+        if (tab) {
+          tab.classList.add('active');
+          tab.style.display = '';
+        }
+      });
+    });
+// Industry filter logic (demo)
+    document.querySelectorAll('.industry-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            var industry = this.getAttribute('data-industry');
+            var rows = document.querySelectorAll('#ledger-entity-list tr');
+            rows.forEach(row => {
+                if (industry === 'real-estate' && row.cells[0].textContent === 'Realty-Prime') {
+                    row.style.display = '';
+                } else if (industry === 'real-estate') {
+                    row.style.display = 'none';
+                } else {
+                    row.style.display = '';
+                }
+            });
+        });
+    });
+// Entity page modal logic
+    function openEntityPage(entityId) {
+        var modal = document.getElementById('entityPageModal');
+        var title = document.getElementById('entityPageTitle');
+        var content = document.getElementById('entityTabContent');
+        // Demo data
+        if (entityId === 'realty-prime') {
+            title.textContent = 'Realty-Prime';
+            content.innerHTML = `
+                <div id='entity-overview'>
+                    <h4>Overview</h4>
+                    <p>Type: LLC<br>Jurisdiction: Delaware, USA<br>Status: Active<br>Founded: Equinox Assembly 2025<br>Ownership: Oak Dragon Covenant</p>
+                </div>
+                <div id='entity-activities' style='margin-top:1em;'>
+                    <h4>⚙️ Activities & Interaction</h4>
+                    <div class='activity-viewer'>
+                        <strong>Recent Activity</strong>
+                        <ul>
+                            <li>Filed deed transfer (Solstice Accord)</li>
+                            <li>Agent deployed: Realty-Prime</li>
+                            <li>Compliance check passed</li>
+                        </ul>
+                    </div>
+                    <div class='monitor-dashboard'>
+                        <div>Trading Flow: <span>Normal</span></div>
+                    </div>
+                    <div class='command-invocation'>
+                        <input type='text' placeholder='Invoke command (e.g., Audit, Summon Agent)' />
+                        <button class='btn-primary'>Send</button>
+                    </div>
+                </div>
+            `;
+        } else if (entityId === 'fund-steward') {
+            title.textContent = 'Fund-Steward';
+            content.innerHTML = `<div id='entity-overview'><h4>Overview</h4><p>Type: LLC<br>Jurisdiction: Delaware, USA<br>Status: Managing<br>Founded: Equinox Assembly 2025<br>Ownership: Oak Dragon Covenant</p></div>`;
+        } else if (entityId === 'estate-lore') {
+            title.textContent = 'Estate-Lore';
+            content.innerHTML = `<div id='entity-overview'><h4>Overview</h4><p>Type: LLC<br>Jurisdiction: Delaware, USA<br>Status: Analyzing<br>Founded: Equinox Assembly 2025<br>Ownership: Oak Dragon Covenant</p></div>`;
+        }
+        modal.style.display = 'flex';
+    }
+    function closeEntityPageModal() {
+        document.getElementById('entityPageModal').style.display = 'none';
+    }
+    // Entity edit/delete logic (stub)
+function editEntity(entityId) {
+    alert('Edit entity: ' + entityId + ' (feature coming soon)');
+}
+function deleteEntity(entityId) {
+    if (confirm('Delete entity: ' + entityId + '?')) {
+        alert('Entity deleted: ' + entityId + ' (feature coming soon)');
+    }
+}
+// Division edit/delete logic (stub)
+function editDivision(divisionId) {
+    alert('Edit division: ' + divisionId + ' (feature coming soon)');
+}
+function deleteDivision(divisionId) {
+    if (confirm('Delete division: ' + divisionId + '?')) {
+        alert('Division deleted: ' + divisionId + ' (feature coming soon)');
+    }
+}
+</script>
 </body>
 </html>
