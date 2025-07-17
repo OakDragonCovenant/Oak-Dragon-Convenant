@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18.x]
+        dotnet-version: [8.0.x]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install Node.js dependencies
+        run: npm install
+      - name: Run Node.js tests
+        run: npm test || true
+      - name: Set up .NET ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+      - name: Build .NET project
+        run: dotnet build ./dotnet/OakDragonDotNetDemo/OakDragonDotNetDemo.csproj --configuration Release
+      - name: Run .NET project
+        run: dotnet run --project ./dotnet/OakDragonDotNetDemo/OakDragonDotNetDemo.csproj

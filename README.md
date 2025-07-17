@@ -43,6 +43,38 @@ Oak Dragon Covenant
 - **Scalable Architecture**: Dynamic agent spawning and management
 - **Inter-Agent Communication**: Sophisticated agent coordination
 
+## Oak Dragon Covenant Workspace
+
+### Features
+- Node.js/Express backend with ZeroSSL automation
+- .NET (C#) integration with NuGet support
+- Python, Java, C++, PHP, Jupyter, Docker, Kubernetes, and more
+- GitHub Copilot and Copilot Chat for AI coding
+
+### Quick Start
+
+#### Node.js
+- Install dependencies: `npm install`
+- Start server: `npm start`
+- Run tests: `npm test`
+
+#### .NET
+- Navigate to `dotnet/OakDragonDotNetDemo`
+- Build: `dotnet build`
+- Run: `dotnet run`
+- Add NuGet packages: `dotnet add package <PackageName>`
+
+#### Python
+- Open any `.py` file and run/debug with VS Code Python extension
+
+### VS Code Tasks
+- Build/Run Node.js and .NET from the Run/Tasks menu
+- Debug configurations for Node.js, .NET, and Python
+
+### Extensions
+- All major language and cloud tools are pre-installed
+- Use Copilot/Copilot Chat for AI code suggestions
+
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
