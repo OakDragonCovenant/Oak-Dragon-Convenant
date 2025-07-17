@@ -1,12 +1,15 @@
-// Supplier Status API
-const supplierStatusRoutes = require('./routes/supplierStatus');
-app.use('/api/suppliers', supplierStatusRoutes);
+
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const securityRoutes = require('./routes/security');
 const path = require('path');
+// Supplier Status API
+const supplierStatusRoutes = require('./routes/supplierStatus');
+
+const app = express();
+app.use('/api/suppliers', supplierStatusRoutes);
 
 // Internal Modules
 const CovenantSystem = require('./RealtyCovenantProtocol/Core/covenantSystem');
