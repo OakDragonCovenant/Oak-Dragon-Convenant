@@ -267,20 +267,30 @@ class RenderWebsiteControlAgent extends LayeredAgentFramework {
      */
     async deployToRender(ritual) {
         console.log(`${this.name}: 🚀 Deploying to Render.com...`);
-        
+
+        // --- Permission Check ---
+        const userRoles = ritual.userRoles || ritual.roles || [];
+        const allowedRoles = ['MSO', 'DAO_COUNCIL', 'WEBSITE_ADMIN'];
+        const hasPermission = userRoles.some(role => allowedRoles.includes(role));
+        if (!hasPermission) {
+            const msg = `${this.name}: ❌ Permission denied: User lacks WEBSITE_ADMIN or equivalent role for new website deployment.`;
+            console.error(msg);
+            throw new Error('Permission denied: WEBSITE_ADMIN or equivalent required to deploy new websites.');
+        }
+
         try {
             // Prepare deployment configuration
             const deployConfig = await this.prepareDeploymentConfig(ritual);
-            
+
             // Deploy using Render API or webhook
             const deployment = await this.triggerRenderDeployment(deployConfig);
-            
+
             // Connect to Strategos for trading functionality
             const strategosIntegration = await this.integrateStrategosProtocol(deployment);
-            
+
             // Setup monitoring and health checks
             const monitoring = await this.setupWebsiteMonitoring(deployment);
-            
+
             this.websiteStatus = {
                 deployed: true,
                 lastUpdate: new Date().toISOString(),
@@ -290,11 +300,11 @@ class RenderWebsiteControlAgent extends LayeredAgentFramework {
                 strategosIntegration,
                 monitoring
             };
-            
+
             console.log(`${this.name}: ✅ Website deployed successfully to Render`);
             console.log(`${this.name}: 🌐 URL: ${deployment.url}`);
             console.log(`${this.name}: 🎯 Strategos Protocol: ${strategosIntegration.status}`);
-            
+
             return {
                 success: true,
                 platform: 'render',
@@ -304,7 +314,7 @@ class RenderWebsiteControlAgent extends LayeredAgentFramework {
                 websiteStatus: this.websiteStatus,
                 timestamp: new Date().toISOString()
             };
-            
+
         } catch (error) {
             console.error(`${this.name}: ❌ Render deployment failed:`, error.message);
             throw error;

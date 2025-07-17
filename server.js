@@ -198,9 +198,11 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/auth');
 const productsRoutes = require('./routes/products');
 const bankingRoutes = require('./routes/banking');
+const sslRoutes = require('./routes/ssl');
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/banking', bankingRoutes);
+app.use('/api/ssl', sslRoutes);
 
 // --- AccountLifecycleAgent API Proxy (for UI integration) ---
 // POST /api/accounts -> /api/banking/accounts
