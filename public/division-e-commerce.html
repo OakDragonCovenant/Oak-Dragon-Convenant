@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Division</title>
+    <link rel="stylesheet" href="/portal-styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="portal-container">
+        <header class="portal-header">
+            <h1>E Commerce Division</h1>
+            <span class="tagline">Manage all E-Commerce operations and entities</span>
+        </header>
+        <main class="portal-content">
+            <section class="overview-section">
+                <h2>Overview</h2>
+                <p>This section will provide a summary of E-Commerce performance, analytics, and recent activity.</p>
+            </section>
+        <section class="categories-section">
+            <h2>E-Commerce Categories</h2>
+            <div class="category-buttons">
+                <button class="category-btn" onclick="location.href='category-print-on-demand.html'"><i class="fas fa-print"></i> Print on Demand</button>
+                <button class="category-btn" onclick="location.href='category-dropshipping.html'"><i class="fas fa-truck"></i> Dropshipping</button>
+                <button class="category-btn" onclick="location.href='category-digital-products.html'"><i class="fas fa-file-alt"></i> Digital Products</button>
+                <button class="category-btn btn-primary" onclick="openNewCategoryModal()"><i class="fas fa-plus"></i> New Entity</button>
+            </div>
+            <div id="newCategoryModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center;">
+                <div style="background:#fff;padding:2em;border-radius:8px;max-width:400px;margin:auto;">
+                    <h3>New Entity</h3>
+                    <input type="text" id="newCategoryName" placeholder="Entity Name" style="width:100%;margin-bottom:1em;">
+                    <button onclick="createNewCategoryPage()">Create</button>
+                    <button onclick="closeNewCategoryModal()">Cancel</button>
+                </div>
+            </div>
+        </section>
+        </main>
+    </div>
+    <script>
+    function openNewCategoryModal() {
+        document.getElementById('newCategoryModal').style.display = 'flex';
+    }
+    function closeNewCategoryModal() {
+        document.getElementById('newCategoryModal').style.display = 'none';
+    }
+    function createNewCategoryPage() {
+        var name = document.getElementById('newCategoryName').value.trim();
+        if (!name) return;
+        var fileName = 'entity-' + name.toLowerCase().replace(/[^a-z0-9]+/g,'-') + '.html';
+        var html = `<!DOCTYPE html>\n<html lang='en'>\n<head>\n    <meta charset='UTF-8'>\n    <meta name='viewport' content='width=device-width, initial-scale=1.0'>\n    <title>${name} Entity</title>\n    <link rel='stylesheet' href='/portal-styles.css'>\n</head>\n<body>\n    <div class='portal-container'>\n        <header class='portal-header'>\n            <h1>${name} Entity</h1>\n        </header>\n        <main class='portal-content'>\n            <h2>Overview</h2>\n            <p>Details for ${name} will go here.</p>\n        </main>\n    </div>\n</body>\n</html>`;
+        var blob = new Blob([html], {type: 'text/html'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        closeNewCategoryModal();
+    }
+    </script>
+</body>
+</html>
+</html>

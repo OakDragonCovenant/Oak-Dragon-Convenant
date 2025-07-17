@@ -1,0 +1,70 @@
+name: Oak Dragon Covenant Multi-Cloud Deploy & Failover
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy-failover:
+    runs-on: ubuntu-latest
+    env:
+      IONOS_API_USER: ${{ secrets.IONOS_API_USER }}
+      IONOS_API_PASS: ${{ secrets.IONOS_API_PASS }}
+      DOMAIN: ${{ secrets.DOMAIN }}
+      FALLBACK_IP: ${{ secrets.FALLBACK_IP }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+      DO_SSH_KEY: ${{ secrets.DO_SSH_KEY }}
+      DO_IP: ${{ secrets.DO_IP }}
+      DO_DEPLOY_CMD: ${{ secrets.DO_DEPLOY_CMD }}
+      RAILWAY_API_KEY: ${{ secrets.RAILWAY_API_KEY }}
+      RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      ALERT_WEBHOOK: ${{ secrets.ALERT_WEBHOOK }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y jq openssh-client
+      - name: Make scripts executable
+        run: chmod +x dns_failover.sh check-env.sh
+      - name: Check environment variables
+        run: ./check-env.sh
+      - name: Run DNS Failover & Multi-Cloud Deploy
+        run: ./dns_failover.sh
+name: Oak Dragon Covenant Auto-Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy to DigitalOcean
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ${{ secrets.DO_SSH_KEY }} root@${{ secrets.DO_IP }} 'cd /var/www/Oak-Dragon-Convenant && git pull && pm2 restart oak-dragon-main || pm2 start server.js --name oak-dragon-main'
+      - name: Deploy to Railway
+        run: |
+          curl -X POST https://backboard.railway.com/graphql/v2 \
+            -H 'Authorization: Bearer ${{ secrets.RAILWAY_API_KEY }}' \
+            -H 'Content-Type: application/json' \
+            -d '{"query":"mutation { deploymentCreate(input: { projectId: \"${{ secrets.RAILWAY_PROJECT_ID }}\" }) { id status } }"}'
+      - name: Deploy to Render
+        run: |
+          curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
+            -H 'Authorization: Bearer ${{ secrets.RENDER_API_KEY }}' \
+            -H 'Accept: application/json'
+      - name: Health Check
+        run: |
+          curl -f https://${{ secrets.DOMAIN }}/health || (echo "Health check failed!" && exit 1)
+      - name: Trigger DNS Failover if Down
+        if: failure()
+        run: |
+          bash dns_failover.sh

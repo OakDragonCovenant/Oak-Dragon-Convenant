@@ -1,7 +1,11 @@
+// Supplier Status API
+const supplierStatusRoutes = require('./routes/supplierStatus');
+app.use('/api/suppliers', supplierStatusRoutes);
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
+const securityRoutes = require('./routes/security');
 const path = require('path');
 
 // Internal Modules
@@ -61,6 +65,7 @@ const limiter = rateLimit({
     }
 });
 app.use('/api/', limiter);
+app.use('/api', securityRoutes);
 
 // 📝 Request Parsing
 app.use(express.json({ limit: '10mb' }));
@@ -186,8 +191,37 @@ app.use((req, res, next) => {
 });
 
 // --- Authentication Routes ---
+
 const authRoutes = require('./routes/auth');
+const productsRoutes = require('./routes/products');
+const bankingRoutes = require('./routes/banking');
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/banking', bankingRoutes);
+
+// --- AccountLifecycleAgent API Proxy (for UI integration) ---
+// POST /api/accounts -> /api/banking/accounts
+app.post('/api/accounts', (req, res, next) => {
+  req.url = '/accounts';
+  bankingRoutes.handle(req, res, next);
+});
+// GET /api/accounts -> /api/banking/accounts
+app.get('/api/accounts', (req, res, next) => {
+  req.url = '/accounts';
+  bankingRoutes.handle(req, res, next);
+});
+// POST /api/accounts/:id/close (simulate close by removing or marking closed)
+app.post('/api/accounts/:id/close', (req, res, next) => {
+  req.url = `/accounts/${req.params.id}/close`;
+  bankingRoutes.handle(req, res, next);
+});
+// GET /api/accounts/research (demo: return static providers)
+app.get('/api/accounts/research', (req, res) => {
+  res.json([
+    { provider: "Bank A", type: "Business Checking", fees: "$10/mo", api: true },
+    { provider: "Bank B", type: "Business Checking", fees: "$0/mo", api: false }
+  ]);
+});
 
 // --- Division Command Center Routes ---
 const divisionRoutes = require('./routes/divisions');

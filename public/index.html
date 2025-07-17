@@ -216,6 +216,49 @@ function escapeHTML(str) {
   </style>
 </head>
 <body>
+  <!-- Render Deployment Modal -->
+  <div id="renderDeployModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="renderDeployModalTitle">
+    <div class="modal-content-400" role="document">
+      <h3 id="renderDeployModalTitle">Trigger Render Deployment</h3>
+      <form id="renderDeployForm">
+        <label for="renderServiceId">Render Service ID</label>
+        <input type="text" id="renderServiceId" name="renderServiceId" required class="full-width margin-bottom-1em" autocomplete="off"><br>
+        <button type="submit" class="btn-primary">Deploy</button>
+        <button type="button" class="btn-secondary" onclick="closeRenderDeployModal()">Cancel</button>
+      </form>
+      <div id="renderDeployMsg" class="margin-top-1em"></div>
+    </div>
+  </div>
+
+  <!-- Admin-only controls for Render and Railway Deploy -->
+  <div id="deployControls" style="position:fixed;bottom:24px;right:24px;z-index:2000;display:none;">
+    <button id="openRenderDeployBtn" class="btn-primary margin-top-1em">Trigger Render Deploy</button>
+    <label style="display:block;margin-top:0.5em;font-size:0.95em;background:#fff;padding:0.5em 1em;border-radius:6px;box-shadow:0 2px 8px #0001;">
+      <input type="checkbox" id="autoRenderDeployToggle" style="vertical-align:middle;margin-right:0.5em;"> Auto-Deploy on Change
+    </label>
+    <span id="autoDeployStatusMsg" style="display:block;font-size:0.92em;color:#888;margin-top:0.2em;"></span>
+    <button id="openRailwayDeployBtn" class="btn-secondary margin-top-1em" style="display:block;">Trigger Railway Deploy</button>
+    <label style="display:block;margin-top:0.5em;font-size:0.95em;background:#fff;padding:0.5em 1em;border-radius:6px;box-shadow:0 2px 8px #0001;">
+      <input type="checkbox" id="autoRailwayDeployToggle" style="vertical-align:middle;margin-right:0.5em;"> Auto-Deploy to Railway
+    </label>
+    <span id="autoRailwayDeployStatusMsg" style="display:block;font-size:0.92em;color:#888;margin-top:0.2em;"></span>
+  </div>
+
+  <!-- Railway Deployment Modal -->
+  <div id="railwayDeployModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="railwayDeployModalTitle">
+    <div class="modal-content-400" role="document">
+      <h3 id="railwayDeployModalTitle">Trigger Railway Deployment</h3>
+      <form id="railwayDeployForm">
+        <label for="railwayProjectId">Railway Project ID</label>
+        <input type="text" id="railwayProjectId" name="railwayProjectId" required class="full-width margin-bottom-1em" autocomplete="off"><br>
+        <label for="railwayEnvId">Environment ID (optional)</label>
+        <input type="text" id="railwayEnvId" name="railwayEnvId" class="full-width margin-bottom-1em" autocomplete="off"><br>
+        <button type="submit" class="btn-primary">Deploy</button>
+        <button type="button" class="btn-secondary" onclick="closeRailwayDeployModal()">Cancel</button>
+      </form>
+      <div id="railwayDeployMsg" class="margin-top-1em"></div>
+    </div>
+  </div>
   <!-- Security Login Modal -->
   <div id="securityLoginModal" class="modal-bg modal-hidden" role="dialog" aria-modal="true" aria-labelledby="securityLoginModalTitle">
     <div class="modal-content-400" role="document">
@@ -262,6 +305,12 @@ function escapeHTML(str) {
         <span><strong>Last Search:</strong> <span id="lenderAgentLastSearch">Loading...</span></span><br>
         <div>
           <span><strong>New Lenders Found:</strong></span>
+        </div>
+      </div>
+
+      <!-- Coinbase Agent Minimum Buy Threshold Display -->
+      <div class="coinbase-agent-min-buy margin-top-1em" style="font-size:0.98em;color:#444;">
+        <strong>Coinbase Agent Minimum Buy Threshold:</strong> <span id="coinbaseMinBuy">0.0000001</span>
           <ul id="lenderAgentResults">
             <li>Loading...</li>
           </ul>
@@ -305,6 +354,304 @@ async function fetchLenderAgentResults() {
 document.addEventListener('DOMContentLoaded', function() {
   // You can call fetchLenderAgentResults() here if needed
 });
+// --- Render Deployment Modal Logic ---
+function openRenderDeployModal() {
+  document.getElementById('renderDeployModal').classList.remove('modal-hidden');
+  document.getElementById('renderDeployMsg').textContent = '';
+  document.getElementById('renderDeployForm').reset();
+}
+function closeRenderDeployModal() {
+  document.getElementById('renderDeployModal').classList.add('modal-hidden');
+}
+document.getElementById('renderDeployForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const serviceId = document.getElementById('renderServiceId').value.trim();
+  const msgDiv = document.getElementById('renderDeployMsg');
+  msgDiv.textContent = 'Triggering deployment...';
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    msgDiv.textContent = 'API key required.';
+    return;
+  }
+  try {
+    const res = await fetch(`https://api.render.com/v1/services/${serviceId}/deploys`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Accept': 'application/json'
+      }
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      msgDiv.textContent = 'Error: ' + (err.message || res.status);
+      return;
+    }
+    const data = await res.json();
+    msgDiv.textContent = 'Deployment triggered! Deployment ID: ' + data.id;
+    setTimeout(closeRenderDeployModal, 2000);
+  } catch (err) {
+    msgDiv.textContent = 'Failed: ' + err;
+  }
+};
+
+// Show admin-only Deploy controls if API key is present
+document.addEventListener('DOMContentLoaded', function() {
+  if (getApiKey()) {
+    var controls = document.getElementById('deployControls');
+    if (controls) controls.style.display = 'block';
+    var btn = document.getElementById('openRenderDeployBtn');
+    if (btn) btn.onclick = openRenderDeployModal;
+    var railwayBtn = document.getElementById('openRailwayDeployBtn');
+    if (railwayBtn) railwayBtn.onclick = openRailwayDeployModal;
+    // Render auto-deploy toggle
+    var autoToggle = document.getElementById('autoRenderDeployToggle');
+    if (autoToggle) {
+      autoToggle.checked = localStorage.getItem('AUTO_RENDER_DEPLOY') === '1';
+      autoToggle.onchange = function() {
+        localStorage.setItem('AUTO_RENDER_DEPLOY', autoToggle.checked ? '1' : '0');
+        updateAutoDeployStatus();
+      };
+      updateAutoDeployStatus();
+      if (autoToggle.checked) startAutoRenderDeploy();
+    }
+    // Railway auto-deploy toggle
+    var autoRailwayToggle = document.getElementById('autoRailwayDeployToggle');
+    if (autoRailwayToggle) {
+      autoRailwayToggle.checked = localStorage.getItem('AUTO_RAILWAY_DEPLOY') === '1';
+      autoRailwayToggle.onchange = function() {
+        localStorage.setItem('AUTO_RAILWAY_DEPLOY', autoRailwayToggle.checked ? '1' : '0');
+        updateAutoRailwayDeployStatus();
+      };
+      updateAutoRailwayDeployStatus();
+      if (autoRailwayToggle.checked) startAutoRailwayDeploy();
+    }
+  }
+});
+function updateAutoRailwayDeployStatus() {
+  var msg = document.getElementById('autoRailwayDeployStatusMsg');
+  var enabled = localStorage.getItem('AUTO_RAILWAY_DEPLOY') === '1';
+  msg.textContent = enabled ? 'Auto-deploy to Railway is enabled. Any detected change will trigger a Railway deployment.' : 'Auto-deploy to Railway is off.';
+}
+
+// --- Auto-Deploy to Railway Logic ---
+let lastRailwayDeployHash = localStorage.getItem('RAILWAY_DEPLOY_HASH') || '';
+let autoRailwayDeployInterval = null;
+function startAutoRailwayDeploy() {
+  if (autoRailwayDeployInterval) clearInterval(autoRailwayDeployInterval);
+  autoRailwayDeployInterval = setInterval(checkForAutoRailwayDeploy, 12000); // every 12s
+}
+function stopAutoRailwayDeploy() {
+  if (autoRailwayDeployInterval) clearInterval(autoRailwayDeployInterval);
+  autoRailwayDeployInterval = null;
+}
+function checkForAutoRailwayDeploy() {
+  if (localStorage.getItem('AUTO_RAILWAY_DEPLOY') !== '1') { stopAutoRailwayDeploy(); return; }
+  var mainContent = document.body.innerText || '';
+  var hash = hashString(mainContent);
+  if (hash !== lastRailwayDeployHash) {
+    lastRailwayDeployHash = hash;
+    localStorage.setItem('RAILWAY_DEPLOY_HASH', hash);
+    triggerRailwayAutoDeploy();
+  }
+}
+async function triggerRailwayAutoDeploy() {
+  var projectId = localStorage.getItem('RAILWAY_PROJECT_ID') || '';
+  if (!projectId) {
+    projectId = prompt('Enter your Railway Project ID for auto-deploy:');
+    if (!projectId) return;
+    localStorage.setItem('RAILWAY_PROJECT_ID', projectId);
+  }
+  var apiKey = getRailwayApiKey();
+  if (!apiKey) {
+    openRailwayApiKeyModal();
+    return;
+  }
+  var msg = document.getElementById('autoRailwayDeployStatusMsg');
+  if (msg) msg.textContent = 'Auto-deploying to Railway...';
+  const query = `mutation Deploy($projectId: String!) { deploymentCreate(input: { projectId: $projectId }) { id status } }`;
+  const variables = { projectId };
+  try {
+    const res = await fetch('https://backboard.railway.com/graphql/v2', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables })
+    });
+    const data = await res.json();
+    if (data.errors) {
+      if (msg) msg.textContent = 'Auto-deploy error: ' + data.errors.map(e => e.message).join('; ');
+      return;
+    }
+    if (msg) msg.textContent = 'Auto-deploy triggered! Deployment ID: ' + (data.data?.deploymentCreate?.id || 'N/A');
+  } catch (err) {
+    if (msg) msg.textContent = 'Auto-deploy failed: ' + err;
+  }
+}
+// --- Railway Deployment Modal Logic ---
+function openRailwayDeployModal() {
+  document.getElementById('railwayDeployModal').classList.remove('modal-hidden');
+  document.getElementById('railwayDeployMsg').textContent = '';
+  document.getElementById('railwayDeployForm').reset();
+}
+function closeRailwayDeployModal() {
+  document.getElementById('railwayDeployModal').classList.add('modal-hidden');
+}
+document.getElementById('railwayDeployForm').onsubmit = async function(e) {
+  e.preventDefault();
+  const projectId = document.getElementById('railwayProjectId').value.trim();
+  const envId = document.getElementById('railwayEnvId').value.trim();
+  const msgDiv = document.getElementById('railwayDeployMsg');
+  msgDiv.textContent = 'Triggering deployment...';
+  const apiKey = getRailwayApiKey();
+  if (!apiKey) {
+    msgDiv.textContent = 'API key required.';
+    return;
+  }
+  // GraphQL mutation for deployment
+  const query = `mutation Deploy($projectId: String!, $environmentId: String) { deploymentCreate(input: { projectId: $projectId, environmentId: $environmentId }) { id status } }`;
+  const variables = { projectId };
+  if (envId) variables.environmentId = envId;
+  try {
+    const res = await fetch('https://backboard.railway.com/graphql/v2', {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables })
+    });
+    const data = await res.json();
+    if (data.errors) {
+      msgDiv.textContent = 'Error: ' + data.errors.map(e => e.message).join('; ');
+      return;
+    }
+    msgDiv.textContent = 'Deployment triggered! Deployment ID: ' + (data.data?.deploymentCreate?.id || 'N/A');
+    setTimeout(closeRailwayDeployModal, 2000);
+  } catch (err) {
+    msgDiv.textContent = 'Failed: ' + err;
+  }
+};
+
+// --- Secure Railway API Key Handling ---
+function getRailwayApiKey() {
+  return sessionStorage.getItem('RAILWAY_API_KEY') || '';
+}
+function setRailwayApiKey(key) {
+  sessionStorage.setItem('RAILWAY_API_KEY', key);
+}
+function requireRailwayApiKey() {
+  let key = getRailwayApiKey();
+  if (!key) {
+    openRailwayApiKeyModal();
+  }
+  return key;
+}
+// Modal for Railway API Key entry
+function openRailwayApiKeyModal() {
+  let modal = document.getElementById('railwayApiKeyModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'railwayApiKeyModal';
+    modal.className = 'modal-bg';
+    modal.innerHTML = `
+      <div class="modal-content-400" role="dialog" aria-modal="true" aria-labelledby="railwayApiKeyModalTitle">
+        <h3 id="railwayApiKeyModalTitle">Enter Railway API Key</h3>
+        <form id="railwayApiKeyForm">
+          <label for="railwayApiKeyInput">API Key</label>
+          <input type="password" id="railwayApiKeyInput" name="railwayApiKeyInput" required class="full-width margin-bottom-1em" autocomplete="off"><br>
+          <button type="submit" class="btn-primary">Save</button>
+        </form>
+        <div id="railwayApiKeyMsg" class="margin-top-1em"></div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('railwayApiKeyForm').onsubmit = function(e) {
+      e.preventDefault();
+      const key = document.getElementById('railwayApiKeyInput').value.trim();
+      if (key) {
+        setRailwayApiKey(key);
+        document.getElementById('railwayApiKeyMsg').textContent = 'API key saved!';
+        setTimeout(() => { modal.remove(); location.reload(); }, 800);
+      } else {
+        document.getElementById('railwayApiKeyMsg').textContent = 'API key is required.';
+      }
+    };
+  }
+}
+
+function updateAutoDeployStatus() {
+  var msg = document.getElementById('autoDeployStatusMsg');
+  var enabled = localStorage.getItem('AUTO_RENDER_DEPLOY') === '1';
+  msg.textContent = enabled ? 'Auto-deploy is enabled. Any detected change will trigger a Render deployment.' : 'Auto-deploy is off.';
+}
+
+// --- Auto-Deploy Logic ---
+let lastDeployHash = localStorage.getItem('RENDER_DEPLOY_HASH') || '';
+let autoDeployInterval = null;
+function startAutoRenderDeploy() {
+  if (autoDeployInterval) clearInterval(autoDeployInterval);
+  autoDeployInterval = setInterval(checkForAutoDeploy, 10000); // every 10s
+}
+function stopAutoRenderDeploy() {
+  if (autoDeployInterval) clearInterval(autoDeployInterval);
+  autoDeployInterval = null;
+}
+function checkForAutoDeploy() {
+  if (localStorage.getItem('AUTO_RENDER_DEPLOY') !== '1') { stopAutoRenderDeploy(); return; }
+  // Hash main content (simulate with timestamp or content length for demo)
+  var mainContent = document.body.innerText || '';
+  var hash = hashString(mainContent);
+  if (hash !== lastDeployHash) {
+    lastDeployHash = hash;
+    localStorage.setItem('RENDER_DEPLOY_HASH', hash);
+    triggerRenderAutoDeploy();
+  }
+}
+function hashString(str) {
+  let hash = 0, i, chr;
+  if (str.length === 0) return hash;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return hash.toString();
+}
+async function triggerRenderAutoDeploy() {
+  var serviceId = localStorage.getItem('RENDER_SERVICE_ID') || '';
+  if (!serviceId) {
+    serviceId = prompt('Enter your Render Service ID for auto-deploy:');
+    if (!serviceId) return;
+    localStorage.setItem('RENDER_SERVICE_ID', serviceId);
+  }
+  var apiKey = getApiKey();
+  if (!apiKey) {
+    openApiKeyModal();
+    return;
+  }
+  var msg = document.getElementById('autoDeployStatusMsg');
+  if (msg) msg.textContent = 'Auto-deploying to Render...';
+  try {
+    const res = await fetch(`https://api.render.com/v1/services/${serviceId}/deploys`, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + apiKey,
+        'Accept': 'application/json'
+      }
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      if (msg) msg.textContent = 'Auto-deploy error: ' + (err.message || res.status);
+      return;
+    }
+    const data = await res.json();
+    if (msg) msg.textContent = 'Auto-deploy triggered! Deployment ID: ' + data.id;
+  } catch (err) {
+    if (msg) msg.textContent = 'Auto-deploy failed: ' + err;
+  }
+}
 </script>
 
 <!-- Moved HTML content below out of script block -->

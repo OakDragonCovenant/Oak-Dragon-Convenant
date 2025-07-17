@@ -21,7 +21,8 @@ class CoinbaseCloudDeployer {
                 exchange: 'coinbase',
                 portfolio: 8.89,
                 riskLevel: 'balanced',
-                automationLevel: 'adaptive'
+                automationLevel: 'adaptive',
+                buyThreshold: 'ultra-micro' // Set buy threshold to ultra Micro
             },
             security: {
                 encryption: 'AES-256',
@@ -108,32 +109,52 @@ class CoinbaseCloudDeployer {
     async configureTradingCapabilities() {
         console.log('📊 Phase 3: Configuring Trading Capabilities...');
         
-        // Get micro-trading statistics
+        // Get micro-trading statistics with ultra-micro threshold
         const stats = await this.framework.executeRitual(
-            '!microtrade stats --portfolio=8.89'
+            `!microtrade stats --portfolio=8.89 --buyThreshold=ultra-micro`
         );
-        console.log('   ✅ Micro-trading statistics retrieved');
-        
+        console.log('   ✅ Micro-trading statistics retrieved (ultra Micro threshold)');
+
         // Generate trading recommendations
+        // AUTOMATED: Fetch all available trading pairs from Coinbase API
+        const fetch = require('node-fetch');
+        let allCoinbasePairs = [];
+        try {
+            const response = await fetch('https://api.exchange.coinbase.com/products');
+            const products = await response.json();
+            allCoinbasePairs = products
+                .filter(p => p.quote_currency === 'USD' && p.status === 'online')
+                .map(p => `${p.base_currency}/USD`);
+        } catch (err) {
+            console.error('Failed to fetch pairs from Coinbase API, using fallback list.');
+            allCoinbasePairs = [
+                'BTC/USD','ETH/USD','ADA/USD','SOL/USD','MATIC/USD','LTC/USD','BCH/USD','DOGE/USD','DOT/USD','AVAX/USD',
+                'SHIB/USD','UNI/USD','LINK/USD','ATOM/USD','XLM/USD','ALGO/USD','AAVE/USD','COMP/USD','SUSHI/USD','MKR/USD',
+                'ZRX/USD','YFI/USD','SNX/USD','GRT/USD','CRV/USD','1INCH/USD','ENJ/USD','BAT/USD','AMP/USD','CVC/USD',
+                'RLC/USD','BNT/USD','REN/USD','BAL/USD','NMR/USD','STORJ/USD','ANKR/USD','LRC/USD','CGLD/USD','SKL/USD',
+                'OXT/USD','NU/USD','KEEP/USD','CTSI/USD','BAND/USD','RLY/USD','TRB/USD','FORTH/USD','FET/USD','CLV/USD',
+                'POLY/USD','MIR/USD','PAX/USD','USDT/USD','USDC/USD','DAI/USD','EUR/USD','GBP/USD','CAD/USD','JPY/USD'
+            ];
+        }
         const recommendations = await this.framework.executeRitual(
-            '!microtrade recommendations --portfolio=8.89 --symbols=BTC/USD,ETH/USD,ADA/USD,SOL/USD,MATIC/USD'
+            `!microtrade recommendations --portfolio=8.89 --buyThreshold=ultra-micro --symbols=${allCoinbasePairs.join(',')}`
         );
-        console.log(`   ✅ ${recommendations.totalOpportunities} trading opportunities identified`);
-        console.log(`   ✅ ${recommendations.microTradeCount} micro-trade opportunities available`);
-        
+        console.log(`   ✅ ${recommendations.totalOpportunities} trading opportunities identified (ultra Micro)`);
+        console.log(`   ✅ ${recommendations.microTradeCount} ultra-micro trade opportunities available`);
+
         // Optimize trading settings for cloud
         const optimization = await this.framework.executeRitual(
-            '!microtrade optimize --minTrade=1.00 --maxPercent=0.03 --optimization=true'
+            '!microtrade optimize --minTrade=0.0000001 --maxPercent=0.01 --optimization=true --buyThreshold=ultra-micro'
         );
-        console.log('   ✅ Trading parameters optimized for cloud deployment');
-        
+        console.log('   ✅ Trading parameters optimized for ultra Micro threshold (minTrade=0.0000001)');
+
         // Enhanced trading optimization
         const enhancedTrading = await this.framework.executeRitual(
             '!enhance trading --mode=aggressive --target=profitability'
         );
         console.log('   ✅ Enhanced trading algorithms activated');
         console.log(`   📈 Expected performance improvement: ${enhancedTrading.performanceGain || '175-275%'}\n`);
-        
+
         return { stats, recommendations, optimization, enhancedTrading };
     }
 
